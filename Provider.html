@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css" type="text/css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg" style="background-color: lightblue; border-radius: 8px;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Home</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Browse</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Admin</a>
+          </li>
+        </ul>
+        <ul class="d-flex navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Log In</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <h1 style="text-align: center;">Provider Dashboard</h1>
+    <div class="container-fluid border text-center">
+        <div class="row">
+
+            <div class="col-4 border">
+                <h2>Active Software</h2>
+
+                <div id="carouselExample" class="carousel slide carousel-dark">
+                    <div class="carousel-inner">
+                      <div class="carousel-item active">
+                        <div class="allcards">
+                            <div class="card" style="width: 18rem;">
+                                <img src="https://static-00.iconduck.com/assets.00/clion-icon-512x512-tvyolucv.png" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">CLion</h5>
+                                  <p class="card-text">Fully Integrated C/C++ Development Environment</p>
+                                  <a href="#" class="btn btn-primary">Client Database</a>
+                                  <a href="#" class="btn btn-primary">Generate Serial Numbers</a>
+                                </div>
+                              </div>
+                        </div>
+                      </div>
+                      <div class="carousel-item">
+                        <div class="allcards">
+                            <div class="card" style="width: 18rem;">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Adobe_Photoshop_CC_icon.svg/640px-Adobe_Photoshop_CC_icon.svg.png" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Adobe Photoshop</h5>
+                                  <p class="card-text">Photo editing and raster graphic design software, allows to create, edit, and manipulate graphics and digital art</p>
+                                  <a href="#" class="btn btn-primary">Client Database</a>
+                                  <a href="#" class="btn btn-primary">Generate Serial Numbers</a>
+                                </div>
+                              </div>
+                        </div>                     
+                     </div>
+                      <div class="carousel-item">
+                        <div class="allcards">
+                            <div class="card" style="width: 18rem;">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Adobe_After_Effects_CC_icon.svg/2101px-Adobe_After_Effects_CC_icon.svg.png" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Adobe After Effects</h5>
+                                  <p class="card-text">2.5D animation software used for animation, visual effects, and motion picture compositing</p>
+                                  <a href="#" class="btn btn-primary">Client Database</a>
+                                  <a href="#" class="btn btn-primary">Generate Serial Numbers</a>
+                                </div>
+                              </div>
+                        </div>                      
+                    </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                  </div>
+
+            </div>
+
+            <div class="col-8 border">
+                <h2>Manage </h2>
+                <div class="row">
+                    <form>
+                      <h5>Enable/Disable Serial Numbers</h5>
+                        <div class="mb-3">
+                          <input type="text" class="form-control" id="exampleInput" placeholder="Serial Number">
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Basic outlined example">
+                          <button type="button" class="btn btn-outline-primary">Block</button>
+                          <button type="button" class="btn btn-outline-primary">Enable</button>
+                        </div>
+                        <div class="confirmButton">
+                          <button type="submit" class="btn btn-primary">Confirm Changes</button>
+                        </div>
+                      </form>
+
+                      <form style="margin-top: 30px;">
+                        <h5>Associate Serial Numbers</h5>
+                        <div class="mb-3">
+                          <input type="text" class="form-control" id="exampleInput" placeholder="Serial Number">
+                        </div>
+                        <div class="input-group flex-nowrap">
+                          <span class="input-group-text" id="addon-wrapping">@</span>
+                          <input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="addon-wrapping">
+                        </div>
+                        <div class="dropdown-center" style="margin-top: 10px;">
+                          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Software
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item">CLion</a></li>
+                            <li><a class="dropdown-item">Adobe Photoshop</a></li>
+                            <li><a class="dropdown-item">Adobe After Effects</a></li>
+                          </ul>
+                        </div>
+                        <div class="confirmButton">
+                          <button type="submit" class="btn btn-primary">Confirm Changes</button>
+                        </div>
+                      </form>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

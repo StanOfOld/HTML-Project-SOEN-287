@@ -1,0 +1,19 @@
+.allcards{
+    display: grid;
+    place-items: center;
+}
+
+
+.card{
+    border: none;
+}
+
+
+.confirmButton {
+    margin-top: 10px;
+}
+
+.btn-primary {
+    margin-bottom: 10px;
+}
+
