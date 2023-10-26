@@ -1,6 +1,7 @@
 .allcards{
     display: grid;
     place-items: center;
+    margin-bottom: 20px;
 }
 
 
@@ -13,7 +14,15 @@
     margin-top: 10px;
 }
 
-.btn-primary {
+.btn-secondary {
     margin-bottom: 10px;
 }
 
+body{
+    background-color: #f7ecda;
+}
+
+.container {
+    margin-bottom: 50px;
+    margin-top: 20px;
+}
