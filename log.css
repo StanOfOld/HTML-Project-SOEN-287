@@ -1,0 +1,77 @@
+/* Center the body of the page both horizontally and vertically */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(75, 75, 172);
+}
+
+/* Style your form */
+
+a {
+  color: white;
+  text-decoration: none;
+}
+a:hover {
+  color: grey;
+  text-decoration: underline;
+}
+
+.co {
+  font-size: 40px;
+  color: white;
+}
+
+input[type="text"] {
+  height: 40px;
+  width: 525px;
+}
+
+button {
+  height: 40px;
+  width: 525px;
+  background-color: rgb(95, 95, 170);
+}
+
+button:hover {
+  background-color: grey;
+}
+#ass {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#song {
+  text-align: center;
+}
+
+p {
+  color: white;
+}
+
+input[type="text"] {
+  background-color: rgb(75, 75, 172);
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: 2px solid black; /* Keep the bottom border, or you can set it to none if you want no borders at all */
+}
+
+input[type="password"] {
+  height: 40px;
+  width: 525px;
+}
+input[type="password"] {
+  background-color: rgb(75, 75, 172);
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: 2px solid black; /* Keep the bottom border, or you can set it to none if you want no borders at all */
+}
