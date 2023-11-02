@@ -1,13 +1,14 @@
 /* Center the body of the page both horizontally and vertically */
-html,
 body {
+  background-color: #e5c97a;
+}
+.container {
+  margin-top: 100pt;
   height: 100%;
-  margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(75, 75, 172);
 }
 
 /* Style your form */
@@ -34,7 +35,8 @@ input[type="text"] {
 button {
   height: 40px;
   width: 525px;
-  background-color: rgb(95, 95, 170);
+  background-color: #d2b050;
+  cursor: pointer;
 }
 
 button:hover {
@@ -57,7 +59,7 @@ p {
 }
 
 input[type="text"] {
-  background-color: rgb(75, 75, 172);
+  background-color: #e5c97a;
   border-left: none;
   border-right: none;
   border-top: none;
@@ -69,7 +71,7 @@ input[type="password"] {
   width: 525px;
 }
 input[type="password"] {
-  background-color: rgb(75, 75, 172);
+  background-color: #e5c97a;
   border-left: none;
   border-right: none;
   border-top: none;
