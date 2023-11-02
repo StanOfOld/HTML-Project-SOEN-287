@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="'X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="MainClient.css" /> 
+    <!--script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+    <title>Software License Management</title>
+</head>
+<body style="background-color: #f7ecda;">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg" style="background-color: #e6c670; margin-bottom: 50px;">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="home.html">Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="browse.html">Browse</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="Provider.html">Licenses</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="MainClient.html">Account</a>
+            </li>
+          </ul>
+          <ul class="d-flex navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="login.html">Log In</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!--End of navbar-->
+    <div class="header">
+        <h1>My Licenses</h1>
+        <a href="ClientInfo.html" id="profileButton"><i class="fas fa-user-circle"></i></a>
+    </div>
+    <div class="container contain">
+        <h2>Your Licenses</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial Number</th>
+                    <th>Software Name</th>
+                    <th>Purchase Date</th>
+                    <th>Expiry Date</th>
+                    <th>Action</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>12345-ABCDE-67890-FGHIJ</td>
+                    <td>Software A</td>
+                    <td>2023-10-01</td>
+                    <td>2024-10-01</td>
+                    <td><a href="#" class="link-secondary">Renew</a>
+                    </td>
+                    <td><a href="#" class="delete-icon"><i class="fas fa-trash-alt"></i></a></td>
+                </tr>
+                <tr>
+                    <td>67890-FGHIJ-12345-ABCDE</td>
+                    <td>Software B</td>
+                    <td>2023-09-15</td>
+                    <td>2024-09-15</td>
+                    <td><a href="#" class="link-secondary">Renew</a></td>
+                    <td><a href="#" class="delete-icon"><i class="fas fa-trash-alt"></i></a></td>
+                </tr>
+                <tr>
+                    <td>41974-GCRJN-74650-FGHIJ</td>
+                    <td>Software C</td>
+                    <td>2023-08-28</td>
+                    <td>NA</td>
+                    <td>Purchased</td>
+                    <td><a href="#" class="delete-icon"><i class="fas fa-trash-alt"></i></a></td>
+                </tr>
+                <tr>
+                    <td>97134-FNWID-15055-JDWON</td>
+                    <td>Software D</td>
+                    <td>2022-04-08</td>
+                    <td>2025-10-25</td>
+                    <td><a href="#" class="link-secondary">Renew</a></td>
+                    <td><a href="#" class="delete-icon"><i class="fas fa-trash-alt"></i></a></td>
+                </tr>
+                <tr>
+                    <td>48065-FUEOJ-91610-WINDA</td>
+                    <td>Software E</td>
+                    <td>2023-01-15</td>
+                    <td>NA</td>
+                    <td>Purchased</td>
+                    <td><a href="#" class="delete-icon"><i class="fas fa-trash-alt"></i></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+          <a href="#" class="btn btn-outline-secondary ">Purchase new Licence</a>
+          <a href="#" class="btn btn-outline-secondary ">Add License</a>
+        </div>
+       
+    </div>
+    <footer class="flex-shrink-0 py-4 bg-dark text-white-50" style="margin-top: 100px;position: absolute; bottom: 0; width: 100%; padding: 1rem;">
+      <div class="container text-center">
+        <small>Copyright &copy; Your Licenses</small>
+      </div>
+    </footer>
+</body>
+</html>
