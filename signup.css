@@ -1,12 +1,14 @@
-html,
 body {
+  background-color: #e5c97a;
+}
+
+.as {
   height: 100%;
   margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(75, 75, 172);
 }
 
 a {
@@ -24,7 +26,7 @@ input[type="text"] {
 }
 
 input[type="text"] {
-  background-color: rgb(75, 75, 172);
+  background-color: #e5c97a;
   border-left: none;
   border-right: none;
   border-top: none;
@@ -35,7 +37,7 @@ input[type="password"] {
   width: 525px;
 }
 input[type="password"] {
-  background-color: rgb(75, 75, 172);
+  background-color: #e5c97a;
   border-left: none;
   border-right: none;
   border-top: none;
@@ -47,7 +49,7 @@ input[type="password"] {
 input[type="submit"] {
   height: 40px;
   width: 525px;
-  background-color: rgb(95, 95, 170);
+  background-color: #e5c97a;
 }
 
 input[type="submit"]:hover {
