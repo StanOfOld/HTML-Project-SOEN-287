@@ -1,0 +1,1 @@
+Open the home.html file using Google Chrome preferably. Use the navbar at the top of the page to navigate.

@@ -1,0 +1,28 @@
+.allcards{
+    display: grid;
+    place-items: center;
+    margin-bottom: 20px;
+}
+
+
+.card{
+    border: none;
+}
+
+
+.confirmButton {
+    margin-top: 10px;
+}
+
+.btn-secondary {
+    margin-bottom: 10px;
+}
+
+body{
+    background-color: #f7ecda;
+}
+
+.contain {
+    margin-bottom: 50px;
+    margin-top: 20px;
+}
