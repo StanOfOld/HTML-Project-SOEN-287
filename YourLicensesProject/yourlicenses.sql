@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 16, 2023 at 10:59 PM
+-- Generation Time: Nov 17, 2023 at 01:06 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -39,6 +39,13 @@ CREATE TABLE `account` (
   `authenticationCode` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `account`
+--
+
+INSERT INTO `account` (`accountID`, `firstName`, `lastName`, `email`, `address`, `postalCode`, `password`, `provider`, `authenticationCode`) VALUES
+(1, 'dlo', 'fdjs', 'fjs@gmail.com', '2192 3rd ve', 'yuw4s1', 'defre', 0, 'null');
+
 -- --------------------------------------------------------
 
 --
@@ -51,7 +58,7 @@ CREATE TABLE `license` (
   `clientOwnerID` int(11) NOT NULL,
   `serialNum` varchar(250) NOT NULL,
   `purchaseDate` date NOT NULL DEFAULT current_timestamp(),
-  `expiryDate` date NOT NULL
+  `expiryDate` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -68,7 +75,7 @@ CREATE TABLE `software` (
   `description` text NOT NULL,
   `numDownloads` int(11) NOT NULL,
   `price` decimal(10,0) NOT NULL,
-  `imageLink` varchar(250) NOT NULL
+  `imageLink` varchar(250) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -104,7 +111,7 @@ ALTER TABLE `software`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `license`
