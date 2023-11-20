@@ -32,7 +32,7 @@ function insertAccount(account){
 
 function insertLicense(license) {
   if (license instanceof License) {
-    query(`INSERT INTO license (softwareID, clientOwnerID, serialNum, expiryDate) VALUES (${license.softwareID}, ${license.clientOwnerID}, ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'});`);
+    query(`INSERT INTO license (softwareID, clientOwnerID, serialNum, expiryDate, enabled) VALUES (${license.softwareID}, ${license.clientOwnerID}, ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'}, ${license.enabled});`);
   } else {
     console.error('Invalid license object');
   }
@@ -56,7 +56,7 @@ function alterAccount(account){
 
 function alterLicense(license) {
   if (license instanceof License) {
-    query(`UPDATE license SET serialNum = ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, expiryDate = ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'} WHERE licenseID = ${license.licenseID}`);
+    query(`UPDATE license SET serialNum = ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, expiryDate = ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'}, enabled = ${license.enabled} WHERE licenseID = ${license.licenseID}`);
   } else {
     console.error('Invalid license object');
   }
@@ -85,11 +85,12 @@ class Account {
 }
   
 class License {
-    constructor(softwareID, clientOwnerID, serialNum, expiryDate = null, purchaseDate = null, licenseID = 0) {
+    constructor(softwareID, clientOwnerID, serialNum, enabled = true, expiryDate = null, purchaseDate = null, licenseID = 0) {
       this.licenseID = licenseID;
       this.softwareID = softwareID;
       this.clientOwnerID = clientOwnerID;
       this.serialNum = serialNum;
+      this.enabled = enabled;
 
       //YYYY-MM-DD
       this.purchaseDate = purchaseDate;
