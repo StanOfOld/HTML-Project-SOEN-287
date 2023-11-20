@@ -27,8 +27,12 @@ app.get('/:filename', function (req, res) {
 	
 });
 
-/*console.log("sejse");
-dbhandler.insertAccount(new dbhandler.Account("dlo", "fdjs", "fjs@gmail.com", "2192 3rd ve", "yuw4s1", "defre"));*/
+console.log("sejse");
+dbhandler.insertAccount(new dbhandler.Account("dlo", "fdjs", "fjs@gmail.com", "2192 3rd ve", "yuw4s1", "defre"));
+//dbhandler.insertSoftware(new dbhandler.Software(9, "Ghu", "Graphic", "Lorem Ipsum", "3", "3.99"));
+//dbhandler.insertLicense(new dbhandler.License(4, 9, "dsids"));
+
+dbhandler.query("SELECT * FROM Account;");
 
 var server = app.listen(8081, function () {
 	var host = server.address().address

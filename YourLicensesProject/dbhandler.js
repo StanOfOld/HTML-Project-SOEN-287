@@ -7,38 +7,68 @@ const con = mysql.createConnection({
     password: ""
 });
 
-function insertAccount(account){
-
-    if (account instanceof Account) {
-        
-        try {
-          const query = `
-            INSERT INTO account 
-              (firstName, lastName, email, address, postalCode, password, provider, authenticationCode) 
-            VALUES (\"${account.firstName}\", \"${account.lastName}\", \"${account.email}\", \"${account.address}\", \"${account.postalCode}\", \"${account.password}\", ${account.provider ? 1 : 0}, \"${account.authenticationCode}\");
-          `;
-    
-          con.connect(function(err) {
-            if (err) throw err;
-            console.log("Connected!");
-            con.query(query, function (err, result) {
-              if (err) throw err;
-              console.log("1 record inserted into account");
-            });
-          });
-        } catch (error) {
-          console.error('Error adding account to the database:', error.message);
-        }
-      } else {
-        console.error('Invalid account object');
-      }
+function query(query){
+  try {
+    con.connect(function(err) {
+      con.query(query, function (err, result) {
+        console.log(!err ? "Query Successful: " + query : "Error: " + err);
+        console.log(result);
+        return !err ? result : null;
+      });
+    });
+  } catch (error) {
+    console.error('Error:', error.message);
+    return null;
+  }
 }
 
-function insertLicense(license) {};
+function insertAccount(account){
+  if (account instanceof Account) {
+    query(`INSERT INTO account (firstName, lastName, email, address, postalCode, password, provider, authenticationCode) VALUES (\"${account.firstName}\", \"${account.lastName}\", \"${account.email}\", \"${account.address}\", \"${account.postalCode}\", \"${account.password}\", ${account.provider ? 1 : 0}, \"${account.authenticationCode}\");`);
+  } else {
+    console.error('Invalid account object');
+  }
+};
 
-function insertSoftware(license) {};
+function insertLicense(license) {
+  if (license instanceof License) {
+    query(`INSERT INTO license (softwareID, clientOwnerID, serialNum, expiryDate) VALUES (${license.softwareID}, ${license.clientOwnerID}, ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'});`);
+  } else {
+    console.error('Invalid license object');
+  }
+};
 
-function selectQuery(query) {return null;};
+function insertSoftware(software) {
+  if (software instanceof Software) {
+    query(`INSERT INTO software (ownerID, name, genre, description, numDownloads, price, imageLink) VALUES (${software.ownerID}, \"${software.name}\", \"${software.genre}\", \"${software.description}\", ${software.numDownloads}, ${software.price}, \"${software.imageLink}\");`);
+  } else {
+    console.error('Invalid license object');
+  }
+};
+
+function alterAccount(account){
+  if (account instanceof Account) {
+    query(`UPDATE account SET firstName = \"${account.firstName}\", lastName = \"${account.lastName}\", email = \"${account.email}\", address = \"${account.address}\", postalCode = \"${account.postalCode}\", password = \"${account.password}\", provider = ${account.provider ? 1 : 0}, authenticationCode = \"${account.authenticationCode}\" WHERE accountID = ${account.accountID}`);
+  } else {
+    console.error('Invalid account object');
+  }
+};
+
+function alterLicense(license) {
+  if (license instanceof License) {
+    query(`UPDATE license SET serialNum = ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, expiryDate = ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'} WHERE licenseID = ${license.licenseID}`);
+  } else {
+    console.error('Invalid license object');
+  }
+};
+
+function alterSoftware(software) {
+  if (software instanceof Software) {
+    query(`UPDATE software SET name = "${software.name}", genre = "${software.genre}", description = "${software.description}", numDownloads = ${software.numDownloads}, price = ${software.price}, imageLink = "${software.imageLink}" WHERE softwareID = ${software.softwareID}`);
+  } else {
+    console.error('Invalid software object');
+  }
+};
 
 class Account {
     constructor(firstName, lastName, email, address, postalCode, password, provider = false, accountID = 0, authenticationCode = null) {
@@ -60,6 +90,8 @@ class License {
       this.softwareID = softwareID;
       this.clientOwnerID = clientOwnerID;
       this.serialNum = serialNum;
+
+      //YYYY-MM-DD
       this.purchaseDate = purchaseDate;
       this.expiryDate = expiryDate;
     }
@@ -78,4 +110,4 @@ class Software {
     }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, selectQuery};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query};
