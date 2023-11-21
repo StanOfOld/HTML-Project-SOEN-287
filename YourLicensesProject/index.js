@@ -37,7 +37,7 @@ function display(result, valid){
 	console.log(result);
 }
   
-dbhandler.getAccountById(14, display);
+dbhandler.getAccounts(display);
 
 
 var server = app.listen(8081, function () {

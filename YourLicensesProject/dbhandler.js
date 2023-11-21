@@ -13,7 +13,7 @@ function query(query, callback = function(){}){
       
       con.query(query, function (err, result) {
         console.log(!err ? "Query Successful: " + query : "Error: " + err);
-        console.log(result);
+        //console.log(result);
 
         con.end();
 
@@ -121,8 +121,69 @@ function getLicensesFromSoftwareId(softwareId, callback = function(){}) {
 function getSoftwaresFromOwnerId(ownerId, callback = function(){}) {
   query(`SELECT * FROM software WHERE ownerID = ${ownerId}`, function(result, success) {
     if (success) {
-      const softwares = result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.softwareID));
+      const softwares = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.softwareID)) : null;
       callback(softwares, true);
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
+function getLicensesFromClientId(clientId, callback = function(){}) {
+  query(`SELECT * FROM license WHERE clientOwnerID = ${clientId}`, function(result, success) {
+    if (success) {
+      const licenses = result.length > 0 ? result.map(licenseData => new License(licenseData.softwareID, licenseData.clientOwnerID, licenseData.serialNum, licenseData.enabled, licenseData.expiryDate, licenseData.purchaseDate, licenseData.licenseID)) : null;
+      callback(licenses, licenses !== null);
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
+function getAccountFromEmail(email, callback = function(){}) {
+  query(`SELECT * FROM account WHERE email = "${email}"`, function(result, success) {
+    if (success) {
+      const account = result.length > 0 ? new Account(result[0].firstName, result[0].lastName, result[0].email, result[0].address, result[0].postalCode, result[0].password, result[0].provider, result[0].accountID, result[0].authenticationCode) : null;
+      callback(account, account !== null);
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
+function disableLicenseByLicenseId(licenseId) {
+  query(`UPDATE license SET enabled = false WHERE licenseID = ${licenseId}`);
+}
+
+function enableLicenseByLicenseId(licenseId) {
+  query(`UPDATE license SET enabled = true WHERE licenseID = ${licenseId}`);
+}
+
+function getSoftwareList(pageNumber, itemsPerPage, genre = null, callback = function(){}) {
+  let query = `SELECT * FROM software`;
+
+  if (genre) {
+    query += ` WHERE genre = "${genre}"`;
+  }
+
+  const offset = (pageNumber - 1) * itemsPerPage;
+  query += ` LIMIT ${itemsPerPage} OFFSET ${offset}`;
+
+  query(query, function(result, success) {
+    if (success) {
+      const softwareList = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.softwareID)) : null;
+      callback(softwareList, softwareList !== null);
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
+function getAccounts(callback = function(){}){
+  query(`SELECT * FROM account;`, function(result, success) {
+    if (success) {
+      const accountList = result.length > 0 ? result.map(accountData => new Account(accountData.firstName, accountData.lastName, accountData.email, accountData.address, accountData.postalCode, accountData.password, accountData.provider, accountData.accountID, accountData.authenticationCode)) : null;
+      callback(accountList, accountList !== null);
     } else {
       callback(null, false);
     }
@@ -170,4 +231,4 @@ class Software {
     }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts};
