@@ -16,6 +16,44 @@
           }
 
         </style>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            // Fetch data from the server
+            fetch('/getData')
+              .then(response => response.json())
+              .then(data => {
+                // Manipulate the DOM with the fetched data
+                const tableBody = document.querySelector('.table tbody');
+        
+                data.forEach((item, index) => {
+                  const row = document.createElement('tr');
+                  row.className = 'roww';
+        
+                  const cells = [
+                    document.createElement('th'),
+                    document.createElement('td'),
+                    document.createElement('td'),
+                    document.createElement('td'),
+                    document.createElement('td'),
+                    document.createElement('td'),
+                    document.createElement('td')
+                  ];
+        
+                  cells[0].textContent = index + 1;
+                  cells[1].textContent = item.name;
+                  cells[2].textContent = item.genre;
+                  cells[3].textContent = item.description;
+                  cells[4].textContent = `$${item.price}`;
+                  cells[5].textContent = item.numDownloads;
+                  cells[6].innerHTML = `<a href="#" class="btn btn-outline-secondary">Check out</a>`;
+        
+                  cells.forEach(cell => row.appendChild(cell));
+                  tableBody.appendChild(row);
+                });
+              })
+              .catch(error => console.error('Error fetching data:', error));
+          });
+        </script>
     </head>
 <body>
 
