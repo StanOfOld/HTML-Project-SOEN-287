@@ -11,15 +11,20 @@
             background-color: #f7ecda;
           }
 
-          .roww {
-            
-          }
-
         </style>
         <script>
           document.addEventListener('DOMContentLoaded', function() {
+
+            const queryParams = new URLSearchParams(window.location.search);
+
+            for (const p of queryParams) {
+              console.log(p);
+            }
+
+            console.log(queryParams.page);
+
             // Fetch data from the server
-            fetch('/getData')
+            fetch("/getSoftwareList?" + queryParams.toString())
               .then(response => response.json())
               .then(data => {
                 // Manipulate the DOM with the fetched data
@@ -49,6 +54,31 @@
         
                   cells.forEach(cell => row.appendChild(cell));
                   tableBody.appendChild(row);
+                });
+              })
+              .catch(error => console.error('Error fetching data:', error));
+
+              fetch('/getTopSoftware')
+              .then(response => response.json())
+              .then(data => {
+                // Manipulate the DOM with the fetched data
+                const carouselInner = document.querySelector('.carousel-inner');
+
+                data.forEach((item, index) => {
+                  const carouselItem = document.createElement('div');
+                  carouselItem.className = index === 0 ? 'carousel-item active' : 'carousel-item';
+
+                  const img = document.createElement('img');
+                  img.src = item.imageLink; // Assuming your software object has an "imageLink" property
+
+                  const caption = document.createElement('div');
+                  caption.className = 'carousel-caption';
+                  caption.innerHTML = `<h5>${item.name}</h5><p>${item.description}</p>`;
+
+                  carouselItem.appendChild(img);
+                  carouselItem.appendChild(caption);
+
+                  carouselInner.appendChild(carouselItem);
                 });
               })
               .catch(error => console.error('Error fetching data:', error));
@@ -94,7 +124,7 @@
 
       <div id="carouselBestdeals" class="carousel slide carousel-fade mx-auto mb-5 carousel-dark" style="width: 900px;">
         <div class="carousel-inner">
-          <div class="carousel-item active">
+          <!--div class="carousel-item active">
             <div class="row row-cols-1 row-cols-md-3 g-4" style="text-align: center;">
               <div class="col">
                 <div class="card">
@@ -130,7 +160,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div-->
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselBestdeals" data-bs-slide="prev" style="margin-left: -100px;">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
