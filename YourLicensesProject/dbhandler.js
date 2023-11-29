@@ -186,20 +186,45 @@ function enableLicenseByLicenseId(licenseId) {
   query(`UPDATE license SET enabled = true WHERE licenseID = ${licenseId}`);
 }
 
-function getSoftwareList(pageNumber, itemsPerPage, genre = null, callback = function(){}) {
-  let qury = `SELECT * FROM software`;
+function getSoftwareList(pageNumber, itemsPerPage, genre = null, searchQuery = null, callback = function() {}) {
+  let queryBase = `SELECT * FROM software`;
+  let countQueryBase = `SELECT COUNT(*) as totalCount FROM software`;
 
-  if (genre) {
-    qury += ` WHERE genre = "${genre}"`;
+  // Add genre and search conditions if provided
+  let conditions = [];
+
+  if (genre !== null && genre !== "null") {
+    conditions.push(`genre = "${genre}"`);
   }
 
-  const offset = (pageNumber - 1) * itemsPerPage;
-  qury += ` LIMIT ${itemsPerPage} OFFSET ${offset}`;
+  if (searchQuery !== null && searchQuery.trim() !== "") {
+    conditions.push(`(name LIKE "%${searchQuery}%" OR description LIKE "%${searchQuery}%")`);
+  }
 
-  query(qury, function(result, success) {
+  if (conditions.length > 0) {
+    const whereClause = conditions.join(" AND ");
+    queryBase += ` WHERE ${whereClause}`;
+    countQueryBase += ` WHERE ${whereClause}`;
+  }
+
+  // Add pagination conditions
+  const offset = (pageNumber - 1) * itemsPerPage;
+  queryBase += ` LIMIT ${itemsPerPage} OFFSET ${offset}`;
+
+  query(queryBase, function(result, success) {
     if (success) {
-      const softwareList = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.imgLinkPr1, softwareData.imgLinkPr2, softwareData.softwareID)) : null;
-      callback(softwareList, true);
+      // Fetch count for the specified conditions
+      query(countQueryBase, function(countResult, countSuccess) {
+        if (countSuccess) {
+          const softwareList = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.imgLinkPr1, softwareData.imgLinkPr2, softwareData.softwareID)) : null;
+          const totalCount = countResult[0].totalCount;
+          const totalPages = Math.ceil(totalCount / itemsPerPage);
+          //console.log(softwareList);
+          callback({ softwareList, totalPages }, true);
+        } else {
+          callback(null, false);
+        }
+      });
     } else {
       callback(null, false);
     }
@@ -216,6 +241,8 @@ function getAccounts(callback = function(){}){
     }
   });
 }
+
+
 
 class Account {
     constructor(firstName, lastName, email, address, postalCode, password, provider = false, accountID = 0, authenticationCode = null) {

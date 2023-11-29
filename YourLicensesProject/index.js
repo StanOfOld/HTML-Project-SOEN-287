@@ -48,8 +48,8 @@ app.get('/:route', function (req, res) {
 			res.status(500).send('Internal Server Error');
 		}
 	};
-	console.log(req.query.page);
-	console.log(1);
+	//console.log(req.query.page);
+	//console.log(1);
 
 	switch(route){
 		case "home": readhtml("home.html"); break;
@@ -61,7 +61,7 @@ app.get('/:route', function (req, res) {
 		case "provider": readhtml("Provider.html"); break;
 		case "mainclient": readhtml("MainClient.html"); break;
 
-		case "getSoftwareList": dbhandler.getSoftwareList(req.query.page || 1, 10, req.query.genre || null, getdata); break;
+		case "getSoftwareList": dbhandler.getSoftwareList(req.query.page || 1, 10, req.query.genre || null, req.query.search || null, getdata); break;
         case "getSoftware": if(req.query.id){dbhandler.getSoftwareById(req.query.id, getdata);}; break;
 		case "getTopSoftware": dbhandler.getTopDownloadedSoftware(getdata); break;
 	}

@@ -15,7 +15,36 @@
         <script>
           document.addEventListener('DOMContentLoaded', function() {
 
+            let searchQuery;
+            let selectedGenre;
+
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+            dropdownItems.forEach(item => {
+              item.addEventListener('click', function () {
+                const selectedGenre = item.value;
+                // Update the button text with the selected genre
+                document.getElementById('genreDropdownButton').textContent = selectedGenre;
+                // Store the selected genre in a data attribute for easy access
+                document.getElementById('genreDropdown').setAttribute('data-selected-genre', selectedGenre);
+              });
+            });
+
             const queryParams = new URLSearchParams(window.location.search);
+
+            // Set the selected genre from query parameters
+            const genreParam = queryParams.get('genre');
+            if (genreParam) {
+                document.getElementById('genreDropdownButton').textContent = genreParam;
+                document.getElementById('genreDropdown').setAttribute('data-selected-genre', genreParam);
+            }
+
+            // Set the search query from query parameters
+            const searchParam = queryParams.get('search');
+            if (searchParam) {
+                document.getElementById('searchInput').value = searchParam;
+            }
+            
 
             for (const p of queryParams) {
               console.log(p);
@@ -26,10 +55,12 @@
             // Fetch data from the server
             fetch("/getSoftwareList?" + queryParams.toString())
               .then(response => response.json())
-              .then(data => {
+              .then(responseData => {
                 // Manipulate the DOM with the fetched data
                 const tableBody = document.querySelector('.table tbody');
-        
+
+                const data = responseData.softwareList; // Extract the softwareList property
+
                 data.forEach((item, index) => {
                   const row = document.createElement('tr');
                   row.className = 'roww';
@@ -55,6 +86,8 @@
                   cells.forEach(cell => row.appendChild(cell));
                   tableBody.appendChild(row);
                 });
+
+                generatePagination(responseData.totalPages);
               })
               .catch(error => console.error('Error fetching data:', error));
 
@@ -83,6 +116,49 @@
               })
               .catch(error => console.error('Error fetching data:', error));
           });
+
+          function handleFormSubmit(event) {
+            console.log("triessss");
+            event.preventDefault();
+
+            // Get values from the form
+            searchQuery = document.getElementById('searchInput').value;
+            // Retrieve the selected genre from the data attribute
+            selectedGenre = document.getElementById('genreDropdown').getAttribute('data-selected-genre');
+
+            // Construct the new URL with search and filter parameters
+            const newURL = `/browse?page=1&search=${searchQuery}&genre=${selectedGenre}`;
+
+            // Redirect to the new URL
+            window.location.href = newURL;
+          }
+
+          function generatePagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            console.log(totalPages);
+
+            for (let i = 1; i <= totalPages; i++) {
+              const li = document.createElement('li');
+              li.className = 'page-item';
+              li.innerHTML = `<a class="page-link" href="#" onclick="loadSoftwarePage(${i})">${i}</a>`;
+              pagination.appendChild(li);
+            }
+          }
+
+          function loadSoftwarePage(pageNumber) {
+
+            searchQuery = document.getElementById('searchInput').value;
+            // Retrieve the selected genre from the data attribute
+            selectedGenre = document.getElementById('genreDropdown').getAttribute('data-selected-genre');
+            // Construct the new URL with the updated page parameter
+            var newURL;
+            newURL = `/browse?page=${pageNumber}&search=${searchQuery}&genre=${selectedGenre}`;
+
+
+              // Redirect to the new URL
+            window.location.href = newURL;
+          }
         </script>
     </head>
 <body>
@@ -174,16 +250,18 @@
 
       <p class="h3" style="margin-bottom: 50px;">Explore</p>
 
-      <form class="d-flex" role="search">
+      <form class="d-flex" role="search" onsubmit="handleFormSubmit(event)">
+        <!-- Add an ID to the input field for easy access in JavaScript -->
         <div class="dropdown me-2">
-          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Filter</button>
-          <ul class="dropdown-menu">
-            <li><button class="dropdown-item" type="button">Graphical</button></li>
-            <li><button class="dropdown-item" type="button">Coding</button></li>
-            <li><button class="dropdown-item" type="button">Lifestyle</button></li>
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="genreDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">Filter</button>
+          <ul class="dropdown-menu" id="genreDropdown">
+            <li><button class="dropdown-item" type="button" value="Graphical">Graphical</button></li>
+            <li><button class="dropdown-item" type="button" value="Coding">Coding</button></li>
+            <li><button class="dropdown-item" type="button" value="Lifestyle">Lifestyle</button></li>
           </ul>
         </div>
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <!-- Add an ID to the input field for easy access in JavaScript -->
+        <input id="searchInput" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
         
@@ -203,71 +281,30 @@
             </tr>
           </thead>
           <tbody class="table-group-divider">
-            <tr class="roww">
-              <th scope="row">1</th>
-              <td>Paint Platinum</td>
-              <td>Graphical</td>
-              <td>Paint in platinum with the improved version of Paint...</td>
-              <td>34.99$</td>
-              <td>127398</td>
-              <td><a href="#" class="btn btn-outline-secondary">Check out</a></td>
-            </tr>
-            <tr class="roww">
-              <th scope="row">2</th>
-              <td>Adobe Photoshop</td>
-              <td>Graphical</td>
-              <td>Graphical editor used to modify your photos and...</td>
-              <td>69.99$</td>
-              <td>42974</td>
-              <td><a href="#" class="btn btn-outline-secondary">Check out</a></td>
-            </tr>
-            <tr class="roww">
-              <th scope="row">3</th>
-              <td>Krita+</td>
-              <td>Graphical</td>
-              <td>The Krita software you love with additional filtering options...</td>
-              <td>4.99$</td>
-              <td>31293</td>
-              <td><a href="#" class="btn btn-outline-secondary">Check out</a></td>
-            </tr>
-            <tr class="roww">
-              <th scope="row">4</th>
-              <td>Eclipse+</td>
-              <td>Coding</td>
-              <td>Eclipse IDE with now a green theme and additional...</td>
-              <td>1.99$</td>
-              <td>932791</td>
-              <td><a href="#" class="btn btn-outline-secondary">Check out</a></td>
-            </tr>
-            <tr class="roww">
-              <th scope="row">5</th>
-              <td>Microsoft Excel</td>
-              <td>Coding</td>
-              <td>Microsoft Excel with an exclusive tutorial only available at...</td>
-              <td>39.99$</td>
-              <td>1272133</td>
-              <td><a href="#" class="btn btn-outline-secondary">Check out</a></td>
-            </tr>
-            <tr class="roww">
-              <th scope="row">6</th>
-              <td>GMail+</td>
-              <td>Lifestyle</td>
-              <td>Gmail app with included service to automate actions on...</td>
-              <td>3.99$</td>
-              <td>711</td>
-              <td><a href="#" class="btn btn-outline-secondary">Check out</a></td>
-            </tr>
+            
           </tbody>
         </table>
       </div>
 
-    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
-    </nav>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination" id="pagination">
+          <!-- Previous button -->
+          <li class="page-item" id="prevPage">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+      
+          <!-- Page numbers will be dynamically added here -->
+      
+          <!-- Next button -->
+          <li class="page-item" id="nextPage">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
   </div>
 
