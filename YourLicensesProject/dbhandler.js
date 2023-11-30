@@ -113,7 +113,7 @@ function getLicenseById(licenseId, callback = function(){}) {
 function getSoftwareById(softwareId, callback = function(){}) {
   query(`SELECT * FROM software WHERE softwareID = ${softwareId}`, function(result, success) {
     if (success) {
-      const software = result.length > 0 ? new Software(result[0].ownerID, result[0].name, result[0].genre, result[0].description, result[0].numDownloads, result[0].price, result[0].imageLink, result[0].softwareID) : null;
+      const software = result.length > 0 ? new Software(result[0].ownerID, result[0].name, result[0].genre, result[0].description, result[0].numDownloads, result[0].price, result[0].imageLink, result[0].imgLinkPr1, result[0].imgLinkPr2, result[0].softwareID) : null;
       callback(software, true);
     } else {
       callback(null, false);
@@ -135,7 +135,7 @@ function getLicensesFromSoftwareId(softwareId, callback = function(){}) {
 function getSoftwaresFromOwnerId(ownerId, callback = function(){}) {
   query(`SELECT * FROM software WHERE ownerID = ${ownerId}`, function(result, success) {
     if (success) {
-      const softwares = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.softwareID)) : null;
+      const softwares = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.imgLinkPr1, softwareData.imgLinkPr2, softwareData.softwareID)) : null;
       callback(softwares, true);
     } else {
       callback(null, false);

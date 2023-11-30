@@ -65,7 +65,6 @@ app.get('/:route', function (req, res) {
         case "getSoftware": if(req.query.id){dbhandler.getSoftwareById(req.query.id, getdata);}; break;
 		case "getTopSoftware": dbhandler.getTopDownloadedSoftware(getdata); break;
 	}
-
 });
 
 
