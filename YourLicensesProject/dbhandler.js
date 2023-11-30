@@ -242,6 +242,17 @@ function getAccounts(callback = function(){}){
   });
 }
 
+function existLicenseBySerialNum(serialNum, callback = function(){}) {
+  query(`SELECT * FROM license WHERE serialNum = "${serialNum}"`, function(result, success) {
+      if (success) {
+          const license = result.length > 0 ? new License(result[0].softwareID, result[0].clientOwnerID, result[0].serialNum, result[0].enabled, result[0].expiryDate, result[0].purchaseDate, result[0].licenseID) : null;
+          callback(license, true, serialNum);
+      } else {
+          callback(null, false);
+      }
+  });
+}
+
 
 
 class Account {
@@ -287,4 +298,4 @@ class Software {
   }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, getLicenseBySerialNum};

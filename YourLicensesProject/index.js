@@ -3,12 +3,18 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const dbhandler = require('./dbhandler');
+const bodyParser = require('body-parser');
 
 const publicPath = path.join(__dirname, 'Public');
 
 console.log("isit")
 
 app.use(express.static(publicPath));
+
+app.use(bodyParser.json()); // Parse JSON in the request body
+app.use(bodyParser.urlencoded({ 
+    extended:false
+})); 
 
 /*app.get('/getData', (req, res) => {
 	// Use dbhandler to fetch data
@@ -67,7 +73,35 @@ app.get('/:route', function (req, res) {
 	}
 });
 
+app.post('/:endpoint', function (req, res) {
+    // Ensure this route only handles POST requests
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
+    }
 
+    const endpoint = req.params.endpoint;
+    const postData = req.body;
+
+	console.log(postData);
+
+    switch (endpoint) {
+        case 'genSerial':
+            res.json({ message: 'Handled POST request for genSerial' });
+            break;
+
+        case 'example2':
+            // Handle POST request for 'example2' endpoint
+            // Your logic here
+            res.json({ message: 'Handled POST request for example2' });
+            break;
+
+        // Add more cases as needed
+
+        default:
+            res.status(404).json({ error: 'Endpoint not found' });
+            break;
+    }
+});
 
 //console.log("sejse");
 //dbhandler.insertAccount(new dbhandler.Account("dlo", "fdjs", "fjs@gmail.com", "2192 3rd ve", "yuw4s1", "defre"));
@@ -91,8 +125,31 @@ dbhandler.insertSoftware(new dbhandler.Software(19, "wrtt", "Utility", "Lorem yi
   
 dbhandler.getAccounts(false, display);*/
 
+var tries = 0;
+function generateNewSerialKey(accountId, softwareId){
 
+	//const newLicense = 
 
+	if(tries < 100){
+		dbhandler.existLicenseBySerialNum();
+		tries++;
+	}
+
+}
+
+function generateSerialKeyCallback(data, valid, serialNum = null){
+
+	if(valid && data == null){
+		let currentDate = new Date();
+		const dateAfter30Days = new Date(currentDate);
+		dateAfter30Days.setDate(currentDate.getDate() + 30);
+		dbhandler.insertLicense(new dbhandler.License(0, /*Change this after aut*/1, serialNum, true, `${currentDate.getFullYear}-${currentDate.getMonth + 1}-${currentDate.getDay}`, `${dateAfter30Days.getFullYear}-${dateAfter30Days.getMonth + 1}-${dateAfter30Days.getDay}`), callback);
+	}
+
+	else{
+		generateNewSerialKey(++tries);
+	}
+}
 
 var server = app.listen(8081, function () {
 	var host = server.address().address
