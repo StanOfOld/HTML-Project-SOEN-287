@@ -35,7 +35,10 @@ app.get('/', function (req, res) {
 
 app.get('/:route', function (req, res) {
 
+	
+
 	var route = req.params.route;
+	console.log(route);
 	var displayhtml = function(err, data){
 		if (err) {
 			res.writeHead(404, {'Content-Type': 'text/html'});
@@ -50,6 +53,7 @@ app.get('/:route', function (req, res) {
 	var getdata = function(data, valid){
 		if (valid) {
 			res.json(data);
+			console.log(data);
 		} else {
 			console.log("invalid");
 			res.status(500).send('Internal Server Error');
@@ -71,6 +75,9 @@ app.get('/:route', function (req, res) {
 		case "getSoftwareList": dbhandler.getSoftwareList(req.query.page || 1, 10, req.query.genre || null, req.query.search || null, getdata); break;
         case "getSoftware": if(req.query.id){dbhandler.getSoftwareById(req.query.id, getdata);}; break;
 		case "getTopSoftware": dbhandler.getTopDownloadedSoftware(getdata); break;
+		case "getlicenses": dbhandler.getLicensesFromClientId(req.query.accountID, getdata); break;
+		case "getsoftware": dbhandler.getAllSoftware(getdata); break;
+		case "getaccountinfo": dbhandler.getAccountById(req.query.accountID, getdata); break;
 	}
 });
 
@@ -85,21 +92,19 @@ app.post('/:endpoint', function (req, res) {
 
 	console.log(postData);
 	console.log(endpoint);
-	let accid;
-	let softId;
 
     switch (endpoint) {
         case 'genSerial':
             //res.json({ message: 'Handled POST request for genSerial' });
-			accid = postData.accountId;
-			softId = postData.productId;
+			let accid = postData.accountId;
+			let softId = postData.productId;
 			generateNewSerialKey(accid, softId, function (response) {res.json(response);});
             break;
 
-			case 'logIn':
-				let email = postData.email;
-				let pass = postData.password;
-				authenticate(email, pass, function (account, valid) {
+		case 'logIn':
+			let email = postData.email;
+			let pass = postData.password;
+			authenticate(email, pass, function (account, valid) {
 				if (valid && account) {
 					// Generate and set authentication code (autkey) as a cookie
 					generateNewAutKey(account.accountID, function (account) {
@@ -115,6 +120,41 @@ app.post('/:endpoint', function (req, res) {
 				}
 			});
 			break;
+
+		case "deleteLicense": dbhandler.deleteLicense(req.body.licenseID, function(success){if(success){res.json({success:true});} else{res.status(500).json({ success: false, message: 'Internal Server Error' });}}); break;
+		case "getLicenseByAccount": dbhandler.getAccountFromEmail(req.body.email, (email, (account, success) => {
+			if (success) {
+			  if (account) {
+				dbhandler.getLicensesFromClientId(account.accountID, (licenses, valid) => {
+				  if (valid) {
+					res.json({ success: true, licenses });
+				  } else {
+					res.status(500).json({ success: false, message: 'Internal Server Error' });
+				  }
+				});
+			  } else {
+				res.json({ success: true, licenses: [] }); // No account found for the given email
+			  }
+			} else {
+			  res.status(500).json({ success: false, message: 'Internal Server Error' });
+			}
+		})); break;
+
+		case "renewLicense": dbhandler.renewLicense(req.query.licenseID, function (newExpiryDate, success) {
+			if (success) {
+				res.json({ success: true, newExpiryDate });
+			} else {
+				res.status(500).json({ success: false, message: 'Internal Server Error' });
+			}
+		}); break;
+
+		case "update-user-info": dbhandler.updateUserInfo(req.body, (success) => {
+			if (success) {
+				res.json({ success: true });
+			} else {
+				res.status(500).json({ success: false, message: 'Internal Server Error' });
+			}
+		});
 	
 
         // Add more cases as needed

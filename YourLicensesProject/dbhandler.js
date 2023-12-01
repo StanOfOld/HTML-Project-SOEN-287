@@ -182,6 +182,104 @@ function getTopDownloadedSoftware(callback = function(){}) {
   });
 }
 
+function getAllSoftware(callback) {
+  // Implement logic to fetch all software from the database
+  // Example: Assuming you have a Software model with findAll method
+  Software.findAll()
+      .then(software => {
+          callback(software, true);
+      })
+      .catch(error => {
+          console.error(error);
+          callback(null, false);
+      });
+}
+
+// Add this function to your existing dbhandler.js
+function deleteLicense(licenseID, callback = function () {}) {
+  query(`DELETE FROM license WHERE licenseID = ${licenseID}`, function (result, success) {
+      if (success) {
+          callback(true);
+      } else {
+          callback(false);
+      }
+  });
+}
+
+function renewLicense(licenseID, callback = function() {}) {
+  // Fetch the existing license
+  getLicenseById(licenseID, function (existingLicense, success) {
+    if (success && existingLicense) {
+      // Calculate the new expiry date (assuming one more month is added)
+      const currentDate = new Date(existingLicense.expiryDate);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+
+      // Update the license with the new expiry date
+      query(
+        `UPDATE license SET expiryDate = "${currentDate.toISOString().split('T')[0]}" WHERE licenseID = ${licenseID}`,
+        function (result, success) {
+          if (success) {
+            // Fetch the updated license to send back in the callback
+            getLicenseById(licenseID, function (updatedLicense, success) {
+              if (success && updatedLicense) {
+                callback(updatedLicense, true);
+              } else {
+                callback(null, false);
+              }
+            });
+          } else {
+            callback(null, false);
+          }
+        }
+      );
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
+function getLicensesWithSoftwareInfo(accountID, callback) {
+  query(
+    'SELECT licenses.*, software.name AS softwareName ' +
+    'FROM licenses ' +
+    'JOIN software ON licenses.softwareID = software.softwareID ' +
+    'WHERE licenses.clientOwnerID = ?',
+    [accountID],
+    function (error, results) {
+      if (error) {
+        console.error(error);
+        callback(null, false);
+      } else {
+        const licensesWithSoftware = results.map(row => ({
+          licenseID: row.licenseID,
+          softwareName: row.softwareName, // Use the alias 'softwareName'
+          serialNum: row.serialNum,
+          purchaseDate: row.purchaseDate,
+          expiryDate: row.expiryDate,
+          enabled: row.enabled,
+          // Add other properties as needed
+        }));
+
+        callback(licensesWithSoftware, true);
+      }
+    }
+  );
+}
+
+function updateUserInfo(updatedUserInfo, callback = function() {}) {
+  // Assuming you have a function to update user information in the database
+  const { firstName, lastName, email, address, postalCode } = updatedUserInfo;
+  const query = `UPDATE account SET firstName = "${firstName}", lastName = "${lastName}", address = "${address}", postalCode = "${postalCode}" WHERE email = "${email}"`;
+  
+  query(query, function(result, success) {
+      if (success) {
+          callback(true);
+      } else {
+          callback(false);
+      }
+  });
+}
+
 function disableLicenseByLicenseId(licenseId) {
   query(`UPDATE license SET enabled = false WHERE licenseID = ${licenseId}`);
 }
@@ -300,4 +398,4 @@ class Software {
   }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum, getLicensesWithSoftwareInfo, deleteLicense, renewLicense, updateUserInfo, getAllSoftware};
