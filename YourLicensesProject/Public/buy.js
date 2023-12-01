@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#imglogo').src = "./images/logo/" + data.imageLink;
                 document.querySelector('#imgPrv1').src = "./images/preview/" + (data.imgLinkPr1 || "gray.JPG");
                 document.querySelector('#imgPrv2').src = "./images/preview/" + (data.imgLinkPr2 || "gray.JPG");
-                //console.log(data.imgLinkPr2);
+
 
                 // Add event listener to the "Buy now" button
                 const buyButton = document.querySelector('.btn-outline-secondary');
-                const bod = JSON.stringify({ productId: softwareId });
+                const bod = JSON.stringify({ productId: softwareId, accountId: 1 });
                 console.log(bod);
                 buyButton.addEventListener('click', function () {
                     // Make the POST request with the product ID
@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(data => {
                             // Handle the response data as needed
                             console.log(data);
+
+                            
                             // Optionally, redirect to a success page or show a confirmation message
                         })
                         .catch(error => {
@@ -47,4 +49,18 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {console.error('Error fetching software details:', error); window.location.href = "/browse";});
     }
+
+    fetch(`/logIn`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include credentials in the request
+        body: JSON.stringify({ email: "ppkdi@i--jvj.net", password: "Alexis" }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        });
+
 });

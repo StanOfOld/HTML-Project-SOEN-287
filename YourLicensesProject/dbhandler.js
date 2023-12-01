@@ -10,6 +10,8 @@ const con = mysql.createConnection({
 function query(query, callback = function(){}){
   try {
     con.connect(function(err) {
+
+      console.log("Trying: " + query)
       
       con.query(query, function (err, result) {
         console.log(!err ? "Query Successful: " + query : "Error: " + err);
@@ -20,6 +22,7 @@ function query(query, callback = function(){}){
     });
   } catch (error) {
     console.error('Error:', error.message);
+    console.log("Failed: " + query)
     return callback(null, false);
   }
 }
@@ -41,7 +44,7 @@ function insertAccount(account, callback = function(){}){
 function insertLicense(license, callback = function(){}) {
   if (license instanceof License) {
     query(`INSERT INTO license (softwareID, clientOwnerID, serialNum, expiryDate, enabled) VALUES (${license.softwareID}, ${license.clientOwnerID}, ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'}, ${license.enabled});`);
-    callback(null, true);
+    callback(license.serialNum, true);
   } else {
     console.error('Invalid license object');
     callback(null, false);
@@ -61,7 +64,7 @@ function insertSoftware(software, callback = function(){}) {
 function alterAccount(account, callback = function(){}){
   if (account instanceof Account) {
     query(`UPDATE account SET firstName = \"${account.firstName}\", lastName = \"${account.lastName}\", email = \"${account.email}\", address = \"${account.address}\", postalCode = \"${account.postalCode}\", password = \"${account.password}\", provider = ${account.provider ? 1 : 0}, authenticationCode = \"${account.authenticationCode}\" WHERE accountID = ${account.accountID}`);
-    callback(null, true);
+    callback(account, true);
   } else {
     console.error('Invalid account object');
     callback(null, false);
@@ -157,6 +160,7 @@ function getLicensesFromClientId(clientId, callback = function(){}) {
 function getAccountFromEmail(email, callback = function(){}) {
   query(`SELECT * FROM account WHERE email = "${email}"`, function(result, success) {
     if (success) {
+      console.log(result);
       const account = result.length > 0 ? new Account(result[0].firstName, result[0].lastName, result[0].email, result[0].address, result[0].postalCode, result[0].password, result[0].provider, result[0].accountID, result[0].authenticationCode) : null;
       callback(account, true);
     } else {
@@ -253,8 +257,6 @@ function existLicenseBySerialNum(serialNum, callback = function(){}) {
   });
 }
 
-
-
 class Account {
     constructor(firstName, lastName, email, address, postalCode, password, provider = false, accountID = 0, authenticationCode = null) {
       this.accountID = accountID;
@@ -268,7 +270,7 @@ class Account {
       this.authenticationCode = authenticationCode;
     }
 }
-  
+
 class License {
     constructor(softwareID, clientOwnerID, serialNum, enabled = true, expiryDate = null, purchaseDate = null, licenseID = 0) {
       this.licenseID = licenseID;
@@ -298,4 +300,4 @@ class Software {
   }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, getLicenseBySerialNum};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum};

@@ -4,6 +4,7 @@ const app = express();
 const path = require('path');
 const dbhandler = require('./dbhandler');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const publicPath = path.join(__dirname, 'Public');
 
@@ -83,17 +84,38 @@ app.post('/:endpoint', function (req, res) {
     const postData = req.body;
 
 	console.log(postData);
+	console.log(endpoint);
+	let accid;
+	let softId;
 
     switch (endpoint) {
         case 'genSerial':
-            res.json({ message: 'Handled POST request for genSerial' });
+            //res.json({ message: 'Handled POST request for genSerial' });
+			accid = postData.accountId;
+			softId = postData.productId;
+			generateNewSerialKey(accid, softId, function (response) {res.json(response);});
             break;
 
-        case 'example2':
-            // Handle POST request for 'example2' endpoint
-            // Your logic here
-            res.json({ message: 'Handled POST request for example2' });
-            break;
+			case 'logIn':
+				let email = postData.email;
+				let pass = postData.password;
+				authenticate(email, pass, function (account, valid) {
+				if (valid && account) {
+					// Generate and set authentication code (autkey) as a cookie
+					generateNewAutKey(account.accountID, function (account) {
+						console.log("coooooooo")
+						res.cookie("autkey", account.authenticationCode, {
+							httpOnly: true,
+							secure: true,
+						});
+						res.send("Cookie set");
+					});
+				} else {
+					res.send("Wrong password or email");
+				}
+			});
+			break;
+	
 
         // Add more cases as needed
 
@@ -125,35 +147,52 @@ dbhandler.insertSoftware(new dbhandler.Software(19, "wrtt", "Utility", "Lorem yi
   
 dbhandler.getAccounts(false, display);*/
 
-var tries = 0;
-function generateNewSerialKey(accountId, softwareId){
+function generateNewSerialKey(accountId, softwareId, callback = function(){}){
 
-	//const newLicense = 
+	const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-	if(tries < 100){
-		dbhandler.existLicenseBySerialNum();
-		tries++;
-	}
+  	const generateRandomNumbers = (count) => Array.from({ length: count }, () => getRandomInt(0, 10)).join('');
+  	const generateRandomLetters = (count) => Array.from({ length: count }, () => String.fromCharCode(getRandomInt(65, 91))).join('');
+
+  	const serialNumber = generateRandomNumbers(5) + generateRandomLetters(7) + generateRandomNumbers(3);
+
+	let currentDate = new Date();
+	const dateAfter30Days = new Date(currentDate);
+	dateAfter30Days.setDate(currentDate.getDate() + 30);
+	dbhandler.insertLicense(new dbhandler.License(softwareId, /*Change this after aut*/accountId, serialNumber, true, `${currentDate.getFullYear}-${currentDate.getMonth + 1}-${currentDate.getDay}`, `${dateAfter30Days.getFullYear}-${dateAfter30Days.getMonth + 1}-${dateAfter30Days.getDay}`), callback);
 
 }
 
-function generateSerialKeyCallback(data, valid, serialNum = null){
+function generateNewAutKey(accountId, callback = function(){}){
 
-	if(valid && data == null){
-		let currentDate = new Date();
-		const dateAfter30Days = new Date(currentDate);
-		dateAfter30Days.setDate(currentDate.getDate() + 30);
-		dbhandler.insertLicense(new dbhandler.License(0, /*Change this after aut*/1, serialNum, true, `${currentDate.getFullYear}-${currentDate.getMonth + 1}-${currentDate.getDay}`, `${dateAfter30Days.getFullYear}-${dateAfter30Days.getMonth + 1}-${dateAfter30Days.getDay}`), callback);
-	}
+	const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-	else{
-		generateNewSerialKey(++tries);
-	}
+  	const generateRandomNumbers = (count) => Array.from({ length: count }, () => getRandomInt(0, 10)).join('');
+  	const generateRandomLetters = (count) => Array.from({ length: count }, () => String.fromCharCode(getRandomInt(65, 91))).join('');
+
+  	const autNumber = generateRandomNumbers(7) + generateRandomLetters(7) + generateRandomNumbers(4);
+
+	let currentDate = new Date();
+	const dateAfter30Days = new Date(currentDate);
+	dateAfter30Days.setDate(currentDate.getDate() + 30);
+	dbhandler.getAccountById(accountId, function(account, valid){if(valid && account){account.authenticationCode = autNumber; dbhandler.alterAccount(account, callback)}});
+}
+
+function authenticate(email, password, callback = function(){}){
+	dbhandler.getAccountFromEmail(email, function(account, valid){
+		if(valid && account){
+			if(password == account.password){
+				//console.log(account);
+				generateNewAutKey(account.accountID, callback);
+			} 
+			else {callback(null, false);}
+		}
+	});
 }
 
 var server = app.listen(8081, function () {
-	var host = server.address().address
-	var port = server.address().port
+	var host = server.address().address;
+	var port = server.address().port;
 	
 	console.log("Your Licenses listening at http://%s:%s", host, port)
 })
