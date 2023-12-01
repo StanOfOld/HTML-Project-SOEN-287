@@ -15,7 +15,8 @@ app.use(express.static(publicPath));
 app.use(bodyParser.json()); // Parse JSON in the request body
 app.use(bodyParser.urlencoded({ 
     extended:false
-})); 
+}));
+app.use(cookieParser());
 
 /*app.get('/getData', (req, res) => {
 	// Use dbhandler to fetch data
@@ -35,50 +36,54 @@ app.get('/', function (req, res) {
 
 app.get('/:route', function (req, res) {
 
-	
+	dbhandler.getAccountFromAutkey(req.cookies.autkey, function(account, valid) {
 
-	var route = req.params.route;
-	console.log(route);
-	var displayhtml = function(err, data){
-		if (err) {
-			res.writeHead(404, {'Content-Type': 'text/html'});
-			return res.end("404 Not Found");
-		} 
-		res.writeHead(200, {'Content-Type': 'text/html'});
-		res.write(data);
-		return res.end();
-	};
-	var readhtml = (htmlfile) => {fs.readFile(path.join(publicPath, htmlfile), displayhtml)};
 
-	var getdata = function(data, valid){
-		if (valid) {
-			res.json(data);
-			console.log(data);
-		} else {
-			console.log("invalid");
-			res.status(500).send('Internal Server Error');
+		var autaccountid = account ? account.accountID : null;
+
+		var route = req.params.route;
+		console.log(route);
+		var displayhtml = function(err, data){
+			if (err) {
+				res.writeHead(404, {'Content-Type': 'text/html'});
+				return res.end("404 Not Found");
+			} 
+			res.writeHead(200, {'Content-Type': 'text/html'});
+			res.write(data);
+			return res.end();
+		};
+		var readhtml = (htmlfile) => {fs.readFile(path.join(publicPath, htmlfile), displayhtml)};
+
+		var getdata = function(data, valid){
+			if (valid) {
+				res.json(data);
+				console.log(data);
+			} else {
+				console.log("invalid");
+				res.status(500).send('Internal Server Error');
+			}
+		};
+		//console.log(req.query.page);
+		//console.log(1);
+
+		switch(route){
+			case "home": readhtml("home.html"); break;
+			case "browse": readhtml("browse.html"); break;
+			case "buy": readhtml("buy.html"); break;
+			case "clientinfo": readhtml("ClientInfo.html"); break;
+			case "login": readhtml("login.html"); break;
+			case "signup": readhtml("signup.html"); break;
+			case "provider": readhtml("Provider.html"); break;
+			case "mainclient": readhtml("MainClient.html"); break;
+
+			case "getSoftwareList": dbhandler.getSoftwareList(req.query.page || 1, 10, req.query.genre || null, req.query.search || null, getdata); break;
+			case "getSoftware": if(req.query.id){dbhandler.getSoftwareById(req.query.id, getdata);}; break;
+			case "getTopSoftware": dbhandler.getTopDownloadedSoftware(getdata); break;
+			case "getlicenses": dbhandler.getLicensesFromClientId(autaccountid || req.query.accountID, getdata); break;
+			case "getsoftware": dbhandler.getAllSoftware(getdata); break;
+			case "getaccountinfo": dbhandler.getAccountById(autaccountid || req.query.accountID, getdata); break;
 		}
-	};
-	//console.log(req.query.page);
-	//console.log(1);
-
-	switch(route){
-		case "home": readhtml("home.html"); break;
-		case "browse": readhtml("browse.html"); break;
-		case "buy": readhtml("buy.html"); break;
-		case "clientinfo": readhtml("ClientInfo.html"); break;
-		case "login": readhtml("login.html"); break;
-		case "signup": readhtml("signup.html"); break;
-		case "provider": readhtml("Provider.html"); break;
-		case "mainclient": readhtml("MainClient.html"); break;
-
-		case "getSoftwareList": dbhandler.getSoftwareList(req.query.page || 1, 10, req.query.genre || null, req.query.search || null, getdata); break;
-        case "getSoftware": if(req.query.id){dbhandler.getSoftwareById(req.query.id, getdata);}; break;
-		case "getTopSoftware": dbhandler.getTopDownloadedSoftware(getdata); break;
-		case "getlicenses": dbhandler.getLicensesFromClientId(req.query.accountID, getdata); break;
-		case "getsoftware": dbhandler.getAllSoftware(getdata); break;
-		case "getaccountinfo": dbhandler.getAccountById(req.query.accountID, getdata); break;
-	}
+	})
 });
 
 app.post('/:endpoint', function (req, res) {

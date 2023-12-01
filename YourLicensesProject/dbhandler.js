@@ -169,6 +169,18 @@ function getAccountFromEmail(email, callback = function(){}) {
   });
 }
 
+function getAccountFromAutkey(autkey, callback = function(){}) {
+  query(`SELECT * FROM account WHERE authenticationCode = "${autkey}"`, function(result, success) {
+    if (success) {
+      console.log(result);
+      const account = result.length > 0 ? new Account(result[0].firstName, result[0].lastName, result[0].email, result[0].address, result[0].postalCode, result[0].password, result[0].provider, result[0].accountID, result[0].authenticationCode) : null;
+      callback(account, true);
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
 function getTopDownloadedSoftware(callback = function(){}) {
   const qury = 'SELECT * FROM software ORDER BY numDownloads DESC LIMIT 9';
 
@@ -398,4 +410,4 @@ class Software {
   }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum, getLicensesWithSoftwareInfo, deleteLicense, renewLicense, updateUserInfo, getAllSoftware};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum, getLicensesWithSoftwareInfo, deleteLicense, renewLicense, updateUserInfo, getAllSoftware, getAccountFromAutkey};
