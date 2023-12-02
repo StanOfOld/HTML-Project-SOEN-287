@@ -17,6 +17,25 @@ app.use(bodyParser.urlencoded({
     extended:false
 }));
 app.use(cookieParser());
+app.use(function(req, res, next) {
+  fs.readFile(path.join(publicPath, 'navbar.html'), 'utf8', function(err, data) {
+    if (err) {
+      return next(err); // Pass the error to the error handler
+    }
+    res.locals.navbar = data; // Save the navbar HTML in res.locals
+    next();
+  });
+});
+
+app.use(function(req, res, next) {
+	fs.readFile(path.join(publicPath, 'navbarloggedin.html'), 'utf8', function(err, data) {
+	  if (err) {
+		return next(err); // Pass the error to the error handler
+	  }
+	  res.locals.navbarli = data; // Save the navbar HTML in res.locals
+	  next();
+	});
+  });
 
 /*app.get('/getData', (req, res) => {
 	// Use dbhandler to fetch data
@@ -38,7 +57,6 @@ app.get('/:route', function (req, res) {
 
 	dbhandler.getAccountFromAutkey(req.cookies.autkey, function(account, valid) {
 
-
 		var autaccountid = account ? account.accountID : null;
 
 		var route = req.params.route;
@@ -48,8 +66,14 @@ app.get('/:route', function (req, res) {
 				res.writeHead(404, {'Content-Type': 'text/html'});
 				return res.end("404 Not Found");
 			} 
+
+			var htmlString = data.toString('utf-8');
+
+			htmlString = htmlString.replace('<!-- Navbar Placeholder -->', autaccountid ? res.locals.navbarli : res.locals.navbar);
+			htmlString = htmlString.replace('<!-- Account name -->', autaccountid ? account.firstName + " " + account.lastName : "Unknown");
+
 			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.write(data);
+			res.write(htmlString);
 			return res.end();
 		};
 		var readhtml = (htmlfile) => {fs.readFile(path.join(publicPath, htmlfile), displayhtml)};
@@ -87,88 +111,126 @@ app.get('/:route', function (req, res) {
 });
 
 app.post('/:endpoint', function (req, res) {
-    // Ensure this route only handles POST requests
-    if (req.method !== 'POST') {
-        return res.status(405).send('Method Not Allowed');
-    }
 
-    const endpoint = req.params.endpoint;
-    const postData = req.body;
+	dbhandler.getAccountFromAutkey(req.cookies.autkey, function(account, valid) {
 
-	console.log(postData);
-	console.log(endpoint);
+		var autaccountid = account ? account.accountID : null;
 
-    switch (endpoint) {
-        case 'genSerial':
-            //res.json({ message: 'Handled POST request for genSerial' });
-			let accid = postData.accountId;
-			let softId = postData.productId;
-			generateNewSerialKey(accid, softId, function (response) {res.json(response);});
-            break;
+		// Ensure this route only handles POST requests
+		if (req.method !== 'POST') {
+			return res.status(405).send('Method Not Allowed');
+		}
 
-		case 'logIn':
-			let email = postData.email;
-			let pass = postData.password;
-			authenticate(email, pass, function (account, valid) {
-				if (valid && account) {
-					// Generate and set authentication code (autkey) as a cookie
-					generateNewAutKey(account.accountID, function (account) {
+		const endpoint = req.params.endpoint;
+		const postData = req.body;
+
+		console.log(postData);
+		console.log(endpoint);
+
+		switch (endpoint) {
+			case 'genSerial':
+				//res.json({ message: 'Handled POST request for genSerial' });
+				let accid = autaccountid;
+				let softId = postData.productId;
+				if(accid)
+					generateNewSerialKey(accid, softId, function (response) {res.json(response);});
+				else
+					res.redirect("/login");
+				break;
+
+			case 'logInn':
+				let email = postData.email;
+				let pass = postData.password;
+				authenticate(email, pass, function (account, valid) {
+					if (valid && account) {
+						
 						console.log("coooooooo")
 						res.cookie("autkey", account.authenticationCode, {
 							httpOnly: true,
 							secure: true,
 						});
-						res.send("Cookie set");
+						console.log("Cookie set");
+						res.json({accountdata: account, success: "success"});
+						
+					} else {
+						res.json({message: "Wrong password or email"});
+					}
+				});
+				break;
+
+			case 'signup':
+				dbhandler.insertAccount(new dbhandler.Account(postData.firstName, postData.lastName, postData.email, postData.address, postData.postalCode, postData.password, postData.provider), function(account, valid){
+					if (valid && account) {
+						authenticate(account.email, account.password, function (account, valid) {
+							if (valid && account) {
+								
+								console.log("coooooooo")
+								res.cookie("autkey", account.authenticationCode, {
+									httpOnly: true,
+									secure: true,
+								});
+								console.log("Cookie set");
+								res.json({accountdata: account, success: "success"});
+								
+							} else {
+								sendErrorResponse("Error has occurred");
+							}
+						});
+					} else {
+						sendErrorResponse("Error has occurred");
+					}
+
+				});
+				break;
+
+			case "deleteLicense": dbhandler.deleteLicense(req.body.licenseID, function(success){if(success){res.json({success:true});} else{res.status(500).json({ success: false, message: 'Internal Server Error' });}}); break;
+			case "getLicenseByAccount": dbhandler.getAccountFromEmail(req.body.email, (email, (account, success) => {
+				if (success) {
+				if (account) {
+					dbhandler.getLicensesFromClientId(account.accountID, (licenses, valid) => {
+					if (valid) {
+						res.json({ success: true, licenses });
+					} else {
+						res.status(500).json({ success: false, message: 'Internal Server Error' });
+					}
 					});
 				} else {
-					res.send("Wrong password or email");
+					res.json({ success: true, licenses: [] }); // No account found for the given email
+				}
+				} else {
+				res.status(500).json({ success: false, message: 'Internal Server Error' });
+				}
+			})); break;
+
+			case "renewLicense": dbhandler.renewLicense(req.query.licenseID, function (newExpiryDate, success) {
+				if (success) {
+					res.json({ success: true, newExpiryDate });
+				} else {
+					res.status(500).json({ success: false, message: 'Internal Server Error' });
+				}
+			}); break;
+
+			case "update-user-info": dbhandler.updateUserInfo(req.body, (success) => {
+				if (success) {
+					res.json({ success: true });
+				} else {
+					res.status(500).json({ success: false, message: 'Internal Server Error' });
 				}
 			});
-			break;
+		
 
-		case "deleteLicense": dbhandler.deleteLicense(req.body.licenseID, function(success){if(success){res.json({success:true});} else{res.status(500).json({ success: false, message: 'Internal Server Error' });}}); break;
-		case "getLicenseByAccount": dbhandler.getAccountFromEmail(req.body.email, (email, (account, success) => {
-			if (success) {
-			  if (account) {
-				dbhandler.getLicensesFromClientId(account.accountID, (licenses, valid) => {
-				  if (valid) {
-					res.json({ success: true, licenses });
-				  } else {
-					res.status(500).json({ success: false, message: 'Internal Server Error' });
-				  }
-				});
-			  } else {
-				res.json({ success: true, licenses: [] }); // No account found for the given email
-			  }
-			} else {
-			  res.status(500).json({ success: false, message: 'Internal Server Error' });
-			}
-		})); break;
+			// Add more cases as needed
 
-		case "renewLicense": dbhandler.renewLicense(req.query.licenseID, function (newExpiryDate, success) {
-			if (success) {
-				res.json({ success: true, newExpiryDate });
-			} else {
-				res.status(500).json({ success: false, message: 'Internal Server Error' });
-			}
-		}); break;
-
-		case "update-user-info": dbhandler.updateUserInfo(req.body, (success) => {
-			if (success) {
-				res.json({ success: true });
-			} else {
-				res.status(500).json({ success: false, message: 'Internal Server Error' });
-			}
-		});
-	
-
-        // Add more cases as needed
-
-        default:
-            res.status(404).json({ error: 'Endpoint not found' });
-            break;
-    }
+			default:
+				res.status(404).json({ error: 'Endpoint not found' });
+				break;
+		}
+	})
 });
+
+function sendErrorResponse(message, res) {
+    res.json({message: message});
+}
 
 //console.log("sejse");
 //dbhandler.insertAccount(new dbhandler.Account("dlo", "fdjs", "fjs@gmail.com", "2192 3rd ve", "yuw4s1", "defre"));

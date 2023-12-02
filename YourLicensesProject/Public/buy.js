@@ -50,17 +50,4 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {console.error('Error fetching software details:', error); window.location.href = "/browse";});
     }
 
-    fetch(`/logIn`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include credentials in the request
-        body: JSON.stringify({ email: "ppkdi@i--jvj.net", password: "Alexis" }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-        });
-
 });

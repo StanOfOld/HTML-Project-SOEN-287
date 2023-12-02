@@ -34,7 +34,7 @@ function closeconnection(){
 function insertAccount(account, callback = function(){}){
   if (account instanceof Account) {
     query(`INSERT INTO account (firstName, lastName, email, address, postalCode, password, provider, authenticationCode) VALUES (\"${account.firstName}\", \"${account.lastName}\", \"${account.email}\", \"${account.address}\", \"${account.postalCode}\", \"${account.password}\", ${account.provider ? 1 : 0}, \"${account.authenticationCode}\");`);
-    callback(null, true);
+    callback(account, true);
   } else {
     console.error('Invalid account object');
     callback(null, false);
