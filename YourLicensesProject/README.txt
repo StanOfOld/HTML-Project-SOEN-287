@@ -1,0 +1,1 @@
+Use phpmyadmin to import the "yourlicenses.sql" file. Make sure you have installed express, path, body-parser and cookie-parser to use.
