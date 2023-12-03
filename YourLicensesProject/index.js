@@ -114,6 +114,7 @@ app.get('/:route', function (req, res) {
 			case "getaccountinfo": dbhandler.getAccountById(autaccountid || req.query.accountID, getdata); break;
 			case "logout": generateNewAutKey(autaccountid, function (account, valid) {if (valid && account) {res.redirect("/home");}}); break;
 			case "getSoftwareListOwner": dbhandler.getSoftwaresFromOwnerId(autaccountid, getdata); break;
+			default: readhtml("NotFound.html"); 
 		}
 	})
 });
