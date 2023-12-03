@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Assuming you have the accountID from the server-side logic
-    var accountID = 6; // Replace with the actual accountID
+    var accountID = 6;
 
     /*document.querySelector('table').addEventListener('click', function (event) {
         if (event.target.classList.contains('renew-link')) {
@@ -10,15 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });*/
 
-    // Make a request to the server to get the user's licenses based on accountID
     fetch(`/getlicenses`)
         .then(response => response.json())
         .then(data => {
             console.log("Inside fetch");
             console.log(data);
-            // Process the returned data (array of licenses)
             if (data) {
-                // Now you can use the licenses in your client-side logic
                 updateLicenseTable(data);
             }
         })
@@ -54,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var licenseID = event.target.getAttribute('data-license-id');
 
-        // Use the fetch API to renew the license
         fetch(`/renewLicense?licenseid=${licenseID}`, {
             method: 'POST',
             headers: {
@@ -70,14 +65,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 console.log('Renew License Response:', data);
                 if (data.success) {
-                    // Update the table or show a success message
                     console.log('License renewed successfully.');
-
-                    // Optionally, you can update the expiry date in the UI
-                    // by finding the corresponding row and updating the date cell
                     var row = event.target.closest('tr');
-                    var expiryDateCell = row.querySelector('td:nth-child(4)'); // Adjust the index based on your table structure
-                    expiryDateCell.textContent = data.newExpiryDate; // Assuming the server sends the updated expiry date
+                    var expiryDateCell = row.querySelector('td:nth-child(4)');
+                    expiryDateCell.textContent = data.newExpiryDate;
                 } else {
                     console.error('Failed to renew the license.');
                 }
@@ -101,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove the deleted license from the table
                         var row = event.target.closest('tr');
                         row.parentNode.removeChild(row);
                         console.log('License deleted successfully.');

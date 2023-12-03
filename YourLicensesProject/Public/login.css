@@ -1,4 +1,3 @@
-/* Center the body of the page both horizontally and vertically */
 body {
   background-color: #e5c97a;
 }
@@ -10,8 +9,6 @@ body {
   justify-content: center;
   align-items: center;
 }
-
-/* Style your form */
 
 a {
   color: white;
@@ -63,7 +60,7 @@ input[type="text"] {
   border-left: none;
   border-right: none;
   border-top: none;
-  border-bottom: 2px solid black; /* Keep the bottom border, or you can set it to none if you want no borders at all */
+  border-bottom: 2px solid black;
 }
 
 input[type="password"] {
@@ -75,5 +72,5 @@ input[type="password"] {
   border-left: none;
   border-right: none;
   border-top: none;
-  border-bottom: 2px solid black; /* Keep the bottom border, or you can set it to none if you want no borders at all */
+  border-bottom: 2px solid black;
 }

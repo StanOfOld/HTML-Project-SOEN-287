@@ -30,7 +30,7 @@ input[type="text"] {
   border-left: none;
   border-right: none;
   border-top: none;
-  border-bottom: 2px solid black; /* Keep the bottom border, or you can set it to none if you want no borders at all */
+  border-bottom: 2px solid black;
 }
 input[type="password"] {
   height: 40px;
@@ -41,7 +41,7 @@ input[type="password"] {
   border-left: none;
   border-right: none;
   border-top: none;
-  border-bottom: 2px solid black; /* Keep the bottom border, or you can set it to none if you want no borders at all */
+  border-bottom: 2px solid black;
 }
 #song {
   text-align: center;

@@ -8,23 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
     dropdownItems.forEach(item => {
       item.addEventListener('click', function () {
         const selectedGenre = item.value;
-        // Update the button text with the selected genre
         document.getElementById('genreDropdownButton').textContent = selectedGenre;
-        // Store the selected genre in a data attribute for easy access
         document.getElementById('genreDropdown').setAttribute('data-selected-genre', selectedGenre);
       });
     });
 
     const queryParams = new URLSearchParams(window.location.search);
 
-    // Set the selected genre from query parameters
     const genreParam = queryParams.get('genre');
     if (genreParam) {
         document.getElementById('genreDropdownButton').textContent = genreParam;
         document.getElementById('genreDropdown').setAttribute('data-selected-genre', genreParam);
     }
 
-    // Set the search query from query parameters
     const searchParam = queryParams.get('search');
     if (searchParam) {
         document.getElementById('searchInput').value = searchParam;
@@ -37,17 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log(queryParams.page);
 
-    // Fetch data from the server
     fetch("/getSoftwareList?" + queryParams.toString())
       .then(response => response.json())
       .then(responseData => {
-        // Manipulate the DOM with the fetched data
         const tableBody = document.querySelector('.table tbody');
 
         const itemsPerPage = 10;
         const startIndex = ((queryParams.get('page') || 1) - 1) * itemsPerPage;
 
-        const data = responseData.softwareList; // Extract the softwareList property
+        const data = responseData.softwareList;
 
         data.forEach((item, index) => {
           const row = document.createElement('tr');
@@ -79,16 +73,13 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(error => console.error('Error fetching data:', error));
 
-      // Inside the 'DOMContentLoaded' event listener
     fetch('/getTopSoftware')
     .then(response => response.json())
     .then(data => {
-    // Manipulate the DOM with the fetched data
     const carouselInner = document.querySelector('.carousel-inner');
 
     data.forEach((item, index) => {
         if (index % 3 === 0) {
-        // Create a new carousel item for every third item
         const carouselItem = document.createElement('div');
         carouselItem.className = index === 0 ? 'carousel-item active' : 'carousel-item';
 
@@ -99,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
         carouselInner.appendChild(carouselItem);
         }
 
-        // Add a card for each item
         const col = document.createElement('div');
         col.className = 'col';
         let imglink = item.imageLink == null ? "software-logo-409721744.PNG" : item.imageLink;
@@ -115,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         `;
 
-        // Append the card to the current row
         const currentCarouselItem = carouselInner.lastChild;
         currentCarouselItem.lastChild.appendChild(col);
     });
@@ -128,15 +117,11 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("triessss");
     event.preventDefault();
 
-    // Get values from the form
     searchQuery = document.getElementById('searchInput').value;
-    // Retrieve the selected genre from the data attribute
     selectedGenre = document.getElementById('genreDropdown').getAttribute('data-selected-genre');
 
-    // Construct the new URL with search and filter parameters
     const newURL = `/browse?page=1&search=${searchQuery}&genre=${selectedGenre}`;
 
-    // Redirect to the new URL
     window.location.href = newURL;
   }
 
@@ -156,13 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadSoftwarePage(pageNumber) {
 
     searchQuery = document.getElementById('searchInput').value;
-    // Retrieve the selected genre from the data attribute
     selectedGenre = document.getElementById('genreDropdown').getAttribute('data-selected-genre');
-    // Construct the new URL with the updated page parameter
     var newURL;
     newURL = `/browse?page=${pageNumber}&search=${searchQuery}&genre=${selectedGenre}`;
 
-
-      // Redirect to the new URL
     window.location.href = newURL;
   }

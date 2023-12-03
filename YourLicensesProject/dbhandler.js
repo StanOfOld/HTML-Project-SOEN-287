@@ -15,7 +15,6 @@ function query(query, callback = function(){}){
       
       con.query(query, function (err, result) {
         console.log(!err ? "Query Successful: " + query : "Error: " + err);
-        //console.log(result);
         console.log(!err);
         !err ? callback(result, true) : callback(err, false);
       });
@@ -216,8 +215,6 @@ function getTopDownloadedSoftware(callback = function(){}) {
 }
 
 function getAllSoftware(callback) {
-  // Implement logic to fetch all software from the database
-  // Example: Assuming you have a Software model with findAll method
   Software.findAll()
       .then(software => {
           callback(software, true);
@@ -228,7 +225,6 @@ function getAllSoftware(callback) {
       });
 }
 
-// Add this function to your existing dbhandler.js
 function deleteLicense(licenseID, callback = function () {}) {
   query(`DELETE FROM license WHERE licenseID = ${licenseID}`, function (result, success) {
       if (success) {
@@ -240,19 +236,15 @@ function deleteLicense(licenseID, callback = function () {}) {
 }
 
 function renewLicense(licenseID, callback = function() {}) {
-  // Fetch the existing license
   getLicenseById(licenseID, function (existingLicense, success) {
     if (success && existingLicense) {
-      // Calculate the new expiry date (assuming one more month is added)
       const currentDate = new Date(existingLicense.expiryDate);
       currentDate.setMonth(currentDate.getMonth() + 1);
 
-      // Update the license with the new expiry date
       query(
         `UPDATE license SET expiryDate = "${currentDate.toISOString().split('T')[0]}" WHERE licenseID = ${licenseID}`,
         function (result, success) {
           if (success) {
-            // Fetch the updated license to send back in the callback
             getLicenseById(licenseID, function (updatedLicense, success) {
               if (success && updatedLicense) {
                 callback(updatedLicense, true);
@@ -278,7 +270,6 @@ function getLicensesWithSoftwareInfo(accountID, callback = function() {}) {
     'JOIN software ON license.softwareID = software.softwareID ' +
     `WHERE license.clientOwnerID = ${accountID}`,
     function (result, valid) {
-      //console.log("error: " + error);
       if (!valid) {
         callback(null, false);
       } else {
@@ -292,7 +283,7 @@ function getLicensesWithSoftwareInfo(accountID, callback = function() {}) {
             row.purchaseDate,
             row.licenseID
           );
-          license.softwareName = row.softwareName; // Add softwareName property
+          license.softwareName = row.softwareName;
           return license;
         });
 
@@ -304,7 +295,6 @@ function getLicensesWithSoftwareInfo(accountID, callback = function() {}) {
 
 
 function updateUserInfo(updatedUserInfo, callback = function() {}) {
-  // Assuming you have a function to update user information in the database
   const { firstName, lastName, email, address, postalCode } = updatedUserInfo;
   const query = `UPDATE account SET firstName = "${firstName}", lastName = "${lastName}", address = "${address}", postalCode = "${postalCode}" WHERE email = "${email}"`;
   
@@ -341,7 +331,6 @@ function getSoftwareList(pageNumber, itemsPerPage, genre = null, searchQuery = n
   let queryBase = `SELECT * FROM software`;
   let countQueryBase = `SELECT COUNT(*) as totalCount FROM software`;
 
-  // Add genre and search conditions if provided
   let conditions = [];
 
   if (genre !== null && genre !== "null") {
@@ -358,19 +347,16 @@ function getSoftwareList(pageNumber, itemsPerPage, genre = null, searchQuery = n
     countQueryBase += ` WHERE ${whereClause}`;
   }
 
-  // Add pagination conditions
   const offset = (pageNumber - 1) * itemsPerPage;
   queryBase += ` LIMIT ${itemsPerPage} OFFSET ${offset}`;
 
   query(queryBase, function(result, success) {
     if (success) {
-      // Fetch count for the specified conditions
       query(countQueryBase, function(countResult, countSuccess) {
         if (countSuccess) {
           const softwareList = result.length > 0 ? result.map(softwareData => new Software(softwareData.ownerID, softwareData.name, softwareData.genre, softwareData.description, softwareData.numDownloads, softwareData.price, softwareData.imageLink, softwareData.imgLinkPr1, softwareData.imgLinkPr2, softwareData.softwareID)) : null;
           const totalCount = countResult[0].totalCount;
           const totalPages = Math.ceil(totalCount / itemsPerPage);
-          //console.log(softwareList);
           callback({ softwareList, totalPages }, true);
         } else {
           callback(null, false);

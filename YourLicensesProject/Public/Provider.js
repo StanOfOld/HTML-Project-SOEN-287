@@ -1,19 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Other existing code...
 
-    // Fetch software data from the server
-    fetch('/getSoftwareListOwner') // Adjust the URL based on your server endpoint
+    fetch('/getSoftwareListOwner')
         .then(response => response.json())
         .then(data => {
-            // Process the returned data (array of software)
             if (data) {
-                // Now you can use the software in your client-side logic
                 updateSoftwareList(data);
             }
         })
         .catch(error => console.error('Error:', error));
 
-        // Function to handle blocking a serial number
     function blockSerialNumber(serialNumber) {
         fetch('/blockSerial', {
             method: 'POST',
@@ -24,10 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-                // Handle the response from the server
             if (data.success) {
                 alert('Serial number blocked successfully');
-                // You can update the UI or take additional actions as needed
             } else {
                 alert('Failed to block serial number');
             }
@@ -48,10 +41,8 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             console.log(data.success);
-                // Handle the response from the server
             if (data.success) {
                 alert('Serial number enabled successfully');
-                // You can update the UI or take additional actions as needed
             } else {
                 alert('Failed to enable serial number');
             }
@@ -61,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Event listener for the block button click
     document.getElementById('blockButton').addEventListener('click', function () {
         var serialNumberInput = document.getElementById('input1').value;
         blockSerialNumber(serialNumberInput);
@@ -75,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateSoftwareList(softwareList) {
         var softwareContainer = document.getElementById('software-list');
 
-        // Clear existing content
         softwareContainer.innerHTML = '';
         active = " active";
 
@@ -83,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function () {
             var softwareCard = document.createElement('div');
             softwareCard.className = `carousel-item${active}`;
 
-            // Create a card for each software
             softwareCard.innerHTML = `
                 <div class="allcards">
                 <div class="card" style="width: 18rem;">
@@ -96,19 +84,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             active = "";
 
-            // Append the card to the software container
             softwareContainer.appendChild(softwareCard);
         });
     }
 
     function handleFormSubmission() {
-        // Get values from the form
         var serialNumber = document.getElementById("input2").value;
         var email = document.getElementById("emailInput").value;
   
-        // Check if both serial number and email are provided
         if (serialNumber && email) {
-          // Make a POST request using fetch
           fetch('/assSerial', {
             method: 'POST',
             headers: {
@@ -126,11 +110,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return response.json();
           })
           .then(function (data) {
-            // Handle the response data if needed
             alert(data);
           })
           .catch(function (error) {
-            // Handle errors
             console.error('There was a problem with the fetch operation:', error);
           });
         } else {
@@ -138,9 +120,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
   
-      // Add an event listener for the form submission
       document.querySelector('#formass').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission
-        handleFormSubmission(); // Call the function to handle the form submission
+        event.preventDefault();
+        handleFormSubmission();
       });
 });

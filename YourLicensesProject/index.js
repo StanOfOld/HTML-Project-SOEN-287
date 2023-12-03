@@ -12,7 +12,7 @@ console.log("isit")
 
 app.use(express.static(publicPath));
 
-app.use(bodyParser.json()); // Parse JSON in the request body
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ 
     extended:false
 }));
@@ -20,9 +20,9 @@ app.use(cookieParser());
 app.use(function(req, res, next) {
   fs.readFile(path.join(publicPath, 'navbar.html'), 'utf8', function(err, data) {
     if (err) {
-      return next(err); // Pass the error to the error handler
+      return next(err);
     }
-    res.locals.navbar = data; // Save the navbar HTML in res.locals
+    res.locals.navbar = data;
     next();
   });
 });
@@ -30,24 +30,12 @@ app.use(function(req, res, next) {
 app.use(function(req, res, next) {
 	fs.readFile(path.join(publicPath, 'navbarloggedin.html'), 'utf8', function(err, data) {
 	  if (err) {
-		return next(err); // Pass the error to the error handler
+		return next(err);
 	  }
-	  res.locals.navbarli = data; // Save the navbar HTML in res.locals
+	  res.locals.navbarli = data;
 	  next();
 	});
   });
-
-/*app.get('/getData', (req, res) => {
-	// Use dbhandler to fetch data
-	dbhandler.getSoftwareList(1, 10, null, false, (softwareList, valid) => {
-	  if (valid) {
-		res.json(softwareList); // Send data as JSON
-	  } else {
-		console.log("invalid");
-		res.status(500).send('Internal Server Error');
-	  }
-	});
-});*/
 
 app.get('/', function (req, res) {
     res.redirect("/home");
@@ -114,7 +102,7 @@ app.get('/:route', function (req, res) {
 			case "getaccountinfo": dbhandler.getAccountById(autaccountid || req.query.accountID, getdata); break;
 			case "logout": generateNewAutKey(autaccountid, function (account, valid) {if (valid && account) {res.redirect("/home");}}); break;
 			case "getSoftwareListOwner": dbhandler.getSoftwaresFromOwnerId(autaccountid, getdata); break;
-			default: readhtml("NotFound.html"); 
+			default: readhtml("NotFound.html"); break;
 		}
 	})
 });
@@ -125,7 +113,6 @@ app.post('/:endpoint', function (req, res) {
 
 		var autaccountid = account ? account.accountID : null;
 
-		// Ensure this route only handles POST requests
 		if (req.method !== 'POST') {
 			return res.status(405).send('Method Not Allowed');
 		}
@@ -138,7 +125,6 @@ app.post('/:endpoint', function (req, res) {
 
 		switch (endpoint) {
 			case 'genSerial':
-				//res.json({ message: 'Handled POST request for genSerial' });
 				let accid = autaccountid;
 				let softId = postData.productId;
 				if(accid)
@@ -168,7 +154,7 @@ app.post('/:endpoint', function (req, res) {
 				break;
 
 			case 'signup':
-				dbhandler.insertAccount(new dbhandler.Account(postData.firstName, postData.lastName, postData.email, postData.address, postData.postalCode, postData.password, postData.provider), function(account, valid){
+				dbhandler.insertAccount(new dbhandler.Account(postData.firstName, postData.lastName, postData.email, postData.address, postData.postalCode, postData.password, postData.isProvider), function(account, valid){
 					if (valid && account) {
 						authenticate(account.email, account.password, function (account, valid) {
 							if (valid && account) {
@@ -204,7 +190,7 @@ app.post('/:endpoint', function (req, res) {
 					}
 					});
 				} else {
-					res.json({ success: true, licenses: [] }); // No account found for the given email
+					res.json({ success: true, licenses: [] });
 				}
 				} else {
 				res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -297,28 +283,6 @@ app.post('/:endpoint', function (req, res) {
 function sendErrorResponse(message, res) {
     res.json({message: message});
 }
-
-//console.log("sejse");
-//dbhandler.insertAccount(new dbhandler.Account("dlo", "fdjs", "fjs@gmail.com", "2192 3rd ve", "yuw4s1", "defre"));
-//dbhandler.insertAccount(new dbhandler.Account("pid", "fjew", "daa@gmail.com", "daudh", "dsuds", "fesufb"));
-/*dbhandler.insertSoftware(new dbhandler.Software(19, "Ghu", "Graphic", "Lorem Ipsum", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "gsdg", "Graphic", "Lorem vsdgfs", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "Ghfsfu", "Graphic", "Lorem vsfdvg", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "adsa", "Graphic", "Lorem vfsdg", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "adsa", "Utility", "Lorem Ipsum", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "adsa", "Graphic", "Lorem Ipsum", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "adsa", "Utility", "Lorem  gf", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "dhdg", "Graphic", "Lorem vdster", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "hqevs", "Utility", "Lorem vsg", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "njtr", "Graphic", "Lorem svr", "3", "3.99"));
-dbhandler.insertSoftware(new dbhandler.Software(19, "wrtt", "Utility", "Lorem yiky", "3", "3.99"));*/
-//dbhandler.insertLicense(new dbhandler.License(4, 14, "dsids"));
-
-/*function display(result, valid){
-	console.log(result);
-}
-  
-dbhandler.getAccounts(false, display);*/
 
 function generateNewSerialKey(accountId, softwareId, callback = function(){}){
 
