@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(data => {
                             // Handle the response data as needed
                             console.log(data);
+                            if(data.msg == "Not logged in")
+                                window.location.href = "/login";
+
+                            else
+                                window.location.href = "/mainclient";
 
                             
                             // Optionally, redirect to a success page or show a confirmation message

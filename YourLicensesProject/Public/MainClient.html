@@ -42,132 +42,16 @@
           </tbody>
       </table>
       <div>
-        <a href="browse.html" class="btn btn-outline-secondary ">Purchase new Licence</a>
+        <a href="browse" class="btn btn-outline-secondary ">Purchase new Licence</a>
       </div>
   </div>
-    <footer class="flex-shrink-0 py-4 bg-dark text-white-50" style="margin-top: 100px;position: absolute; bottom: 0; width: 100%; padding: 1rem;">
-      <div class="container text-center">
-        <small>Copyright &copy; Your Licenses</small>
-      </div>
-    </footer>
+  <footer class="flex-shrink-0 py-4 bg-dark text-white-50">
+    <div class="container text-center">
+      <small>Copyright &copy; Your Licenses</small>
+    </div>
+  </footer>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-    // Assuming you have the accountID from the server-side logic
-    var accountID = 6; // Replace with the actual accountID
-    document.querySelector('table').addEventListener('click', function (event) {
-    if (event.target.classList.contains('delete-icon')) {
-        event.preventDefault();
-        console.log("Delete clicked");
-        var licenseID = event.target.getAttribute('data-license-id');
-        if (confirm('Are you sure you want to delete this license?')) {
-            fetch(`/deleteLicense?licenseID=${licenseID}`, {
-                method: 'DELETE',
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remove the deleted license from the table
-                    var row = event.target.closest('tr');
-                    row.parentNode.removeChild(row);
-                    console.log('License deleted successfully.');
-                } else {
-                    console.error('Failed to delete the license.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    }
-});
-
-document.querySelector('table').addEventListener('click', function (event) {
-        if (event.target.classList.contains('renew-link')) {
-            event.preventDefault();
-            console.log("Renew clicked");
-
-            var licenseID = event.target.getAttribute('data-license-id');
-
-            // Use the fetch API to renew the license
-            fetch(`/renewLicense?licenseID=${licenseID}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ licenseID: licenseID }), // Include licenseID in the request body
-            })
-            .then(response => {
-                  if (!response.ok) {
-                      throw new Error(`HTTP error! Status: ${response.status}`);
-                  }
-                  return response.json();
-              })                
-              .then(data => {
-                console.log('Renew License Response:', data);
-                    if (data.success) {
-                        // Update the table or show a success message
-                        console.log('License renewed successfully.');
-
-                        // Optionally, you can update the expiry date in the UI
-                        // by finding the corresponding row and updating the date cell
-                        var row = event.target.closest('tr');
-                        var expiryDateCell = row.querySelector('td:nth-child(4)'); // Adjust the index based on your table structure
-                        expiryDateCell.textContent = data.newExpiryDate; // Assuming the server sends the updated expiry date
-                    } else {
-                        console.error('Failed to renew the license.');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-    });
-
-  
-      // Make a request to the server to get the user's licenses based on accountID
-      fetch(`/getlicenses?accountID=${accountID}`)
-          .then(response => response.json())
-          .then(data => {
-              console.log("Inside fetch"); // Add this line
-              console.log(data)
-              // Process the returned data (array of licenses)
-              if (data) {
-                  // Now you can use the licenses in your client-side logic
-                  updateLicenseTable(data);
-              }
-          })
-          .catch(error => console.error('Error:', error))
-          .finally(() => console.log('After fetch')); // Add this line
-  
-          function updateLicenseTable(licenses) {
-
-            var tableBody = document.querySelector('tbody');
-            tableBody.innerHTML = '';
-
-            licenses.forEach(license => {
-              console.log('License:', license);
-
-              var row = document.createElement('tr');
-              row.innerHTML = `
-                <td>${license.serialNum}</td>
-                <td>${license.name}</td> <!-- Use the correct property name -->
-                <td>${formatDate(license.purchaseDate)}</td>
-                <td>${formatDate(license.expiryDate)}</td>
-                <td><a href="#" class="link-secondary renew-link" data-license-id="${license.id}">Renew</a></td>
-                <td><a href="#" class="delete-icon"><i class="fas fa-trash-alt"></i></a></td>
-              `;
-
-              tableBody.appendChild(row);
-            });
-
-            console.log('User Licenses:', licenses);
-          }
-
-
-
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-}
-});
-
-  </script> 
+    <script src="MainClient.js">
+    </script> 
 </body>
 </html>

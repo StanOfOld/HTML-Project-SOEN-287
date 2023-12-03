@@ -16,7 +16,7 @@ function query(query, callback = function(){}){
       con.query(query, function (err, result) {
         console.log(!err ? "Query Successful: " + query : "Error: " + err);
         //console.log(result);
-
+        console.log(!err);
         !err ? callback(result, true) : callback(err, false);
       });
     });
@@ -43,7 +43,7 @@ function insertAccount(account, callback = function(){}){
 
 function insertLicense(license, callback = function(){}) {
   if (license instanceof License) {
-    query(`INSERT INTO license (softwareID, clientOwnerID, serialNum, expiryDate, enabled) VALUES (${license.softwareID}, ${license.clientOwnerID}, ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'}, ${license.enabled});`);
+    query(`INSERT INTO license (softwareID, clientOwnerID, serialNum, expiryDate, enabled) VALUES (${license.softwareID}, ${license.clientOwnerID}, ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)'}, ${license.enabled});`);
     callback(license.serialNum, true);
   } else {
     console.error('Invalid license object');
@@ -73,7 +73,17 @@ function alterAccount(account, callback = function(){}){
 
 function alterLicense(license, callback = function(){}) {
   if (license instanceof License) {
-    query(`UPDATE license SET serialNum = ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, expiryDate = ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'}, enabled = ${license.enabled} WHERE licenseID = ${license.licenseID}`);
+    query(`UPDATE license SET serialNum = ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, expiryDate = ${license.expiryDate ? "DATE(\"" + license.expiryDate + "\")" : 'CURRENT_DATE() + 30'}, enabled = ${license.enabled}, clientOwnerID = ${license.clientOwnerID} WHERE licenseID = ${license.licenseID}`);
+    callback(null, true);
+  } else {
+    console.error('Invalid license object');
+    callback(null, false);
+  }
+};
+
+function alterLicenseWithoutExpiry(license, callback = function(){}) {
+  if (license instanceof License) {
+    query(`UPDATE license SET serialNum = ${license.serialNum ? "\"" + license.serialNum + "\"" : "NULL"}, enabled = ${license.enabled}, clientOwnerID = ${license.clientOwnerID} WHERE licenseID = ${license.licenseID}`);
     callback(null, true);
   } else {
     console.error('Invalid license object');
@@ -104,6 +114,17 @@ function getAccountById(accountId, callback = function(){}) {
 
 function getLicenseById(licenseId, callback = function(){}) {
   query(`SELECT * FROM license WHERE licenseID = ${licenseId}`, function(result, success) {
+    if (success) {
+      const license = result.length > 0 ? new License(result[0].softwareID, result[0].clientOwnerID, result[0].serialNum, result[0].enabled, result[0].expiryDate, result[0].purchaseDate, result[0].licenseID) : null;
+      callback(license, true);
+    } else {
+      callback(null, false);
+    }
+  });
+}
+
+function getLicenseByNum(licenseNum, callback = function(){}) {
+  query(`SELECT * FROM license WHERE serialnum = "${licenseNum}"`, function(result, success) {
     if (success) {
       const license = result.length > 0 ? new License(result[0].softwareID, result[0].clientOwnerID, result[0].serialNum, result[0].enabled, result[0].expiryDate, result[0].purchaseDate, result[0].licenseID) : null;
       callback(license, true);
@@ -211,9 +232,9 @@ function getAllSoftware(callback) {
 function deleteLicense(licenseID, callback = function () {}) {
   query(`DELETE FROM license WHERE licenseID = ${licenseID}`, function (result, success) {
       if (success) {
-          callback(true);
+          callback(result, true);
       } else {
-          callback(false);
+          callback(result, false);
       }
   });
 }
@@ -250,33 +271,37 @@ function renewLicense(licenseID, callback = function() {}) {
   });
 }
 
-function getLicensesWithSoftwareInfo(accountID, callback) {
+function getLicensesWithSoftwareInfo(accountID, callback = function() {}) {
   query(
-    'SELECT licenses.*, software.name AS softwareName ' +
-    'FROM licenses ' +
-    'JOIN software ON licenses.softwareID = software.softwareID ' +
-    'WHERE licenses.clientOwnerID = ?',
-    [accountID],
-    function (error, results) {
-      if (error) {
-        console.error(error);
+    'SELECT license.*, software.name AS softwareName ' +
+    'FROM license ' +
+    'JOIN software ON license.softwareID = software.softwareID ' +
+    `WHERE license.clientOwnerID = ${accountID}`,
+    function (result, valid) {
+      //console.log("error: " + error);
+      if (!valid) {
         callback(null, false);
       } else {
-        const licensesWithSoftware = results.map(row => ({
-          licenseID: row.licenseID,
-          softwareName: row.softwareName, // Use the alias 'softwareName'
-          serialNum: row.serialNum,
-          purchaseDate: row.purchaseDate,
-          expiryDate: row.expiryDate,
-          enabled: row.enabled,
-          // Add other properties as needed
-        }));
+        const licensesWithSoftware = result.map(row => {
+          const license = new License(
+            row.softwareID,
+            row.clientOwnerID,
+            row.serialNum,
+            row.enabled,
+            row.expiryDate,
+            row.purchaseDate,
+            row.licenseID
+          );
+          license.softwareName = row.softwareName; // Add softwareName property
+          return license;
+        });
 
         callback(licensesWithSoftware, true);
       }
     }
   );
 }
+
 
 function updateUserInfo(updatedUserInfo, callback = function() {}) {
   // Assuming you have a function to update user information in the database
@@ -285,19 +310,31 @@ function updateUserInfo(updatedUserInfo, callback = function() {}) {
   
   query(query, function(result, success) {
       if (success) {
-          callback(true);
+          callback(result, true);
       } else {
-          callback(false);
+          callback(null, false);
       }
   });
 }
 
-function disableLicenseByLicenseId(licenseId) {
-  query(`UPDATE license SET enabled = false WHERE licenseID = ${licenseId}`);
+function disableLicenseByLicenseId(licenseId, callback = function() {}) {
+  query(`UPDATE license SET enabled = 0 WHERE licenseID = "${licenseId}"`, function(result, success) {
+    if (success) {
+        callback(result, true);
+    } else {
+        callback(null, false);
+    }
+});
 }
 
-function enableLicenseByLicenseId(licenseId) {
-  query(`UPDATE license SET enabled = true WHERE licenseID = ${licenseId}`);
+function enableLicenseByLicenseId(licenseId, callback = function() {}) {
+  query(`UPDATE license SET enabled = 1 WHERE licenseID = "${licenseId}"`, function(result, success) {
+    if (success) {
+        callback(result, true);
+    } else {
+        callback(null, false);
+    }
+});
 }
 
 function getSoftwareList(pageNumber, itemsPerPage, genre = null, searchQuery = null, callback = function() {}) {
@@ -367,6 +404,16 @@ function existLicenseBySerialNum(serialNum, callback = function(){}) {
   });
 }
 
+function deleteAccount(accountID, callback = function () {}) {
+  query(`DELETE FROM account WHERE accountID = ${accountID}`, function (result, success) {
+      if (success) {
+          callback(null, true);
+      } else {
+          callback(null, false);
+      }
+  });
+}
+
 class Account {
     constructor(firstName, lastName, email, address, postalCode, password, provider = false, accountID = 0, authenticationCode = null) {
       this.accountID = accountID;
@@ -410,4 +457,4 @@ class Software {
   }
 }
 
-module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum, getLicensesWithSoftwareInfo, deleteLicense, renewLicense, updateUserInfo, getAllSoftware, getAccountFromAutkey};
+module.exports = {Account, License, Software, insertAccount, insertLicense, insertSoftware, alterAccount, alterLicense, alterSoftware, query, getAccountById, getLicenseById, getSoftwareById, getLicensesFromSoftwareId, getSoftwaresFromOwnerId, getLicensesFromClientId, getAccountFromEmail, disableLicenseByLicenseId, enableLicenseByLicenseId, getSoftwareList, getAccounts, closeconnection, getTopDownloadedSoftware, existLicenseBySerialNum, getLicensesWithSoftwareInfo, deleteLicense, renewLicense, updateUserInfo, getAllSoftware, getAccountFromAutkey, deleteAccount, getLicenseByNum, alterLicenseWithoutExpiry};

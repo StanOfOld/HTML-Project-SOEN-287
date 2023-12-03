@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 30, 2023 at 01:19 AM
+-- Generation Time: Dec 03, 2023 at 01:31 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -44,11 +44,9 @@ CREATE TABLE `account` (
 --
 
 INSERT INTO `account` (`accountID`, `firstName`, `lastName`, `email`, `address`, `postalCode`, `password`, `provider`, `authenticationCode`) VALUES
-(1, 'Abel', 'Spencer', 'oupo@j--dw-.org', '87 South White Milton Way', '26974', 'Jeanine9', 0, NULL),
-(2, 'Erick', 'Leonard', 'omuk@---dio.com', '814 South Rocky Second Road', '73847', 'Tabatha', 0, NULL),
-(3, 'Janice', 'Montes', 'ljlg1@---ln-.com', '83 North Rocky Hague Parkway', '33036', 'Clinton', 1, NULL),
+(3, 'Janice', 'Montes', 'ljlg1@---ln-.com', '83 North Rocky Hague Parkway', '33036', 'Clinton', 1, '2653412WAKUECP0812'),
 (4, 'Gretchen', 'Proctor', 'vxxd.xgfbkp@-e--ch.org', '43 North Rocky Second Drive', '62614', 'Casey626', 0, NULL),
-(5, 'Lawanda', 'Velazquez', 'ppkdi@i--jvj.net', '84 South Rocky First Freeway', '45384', 'Alexis', 0, NULL),
+(5, 'Lawanda', 'Velazquez', 'ppkdi@i--jvj.net', '84 South Rocky First Freeway', '45384', 'Alexis', 0, '1641366ETLGRMJ9875'),
 (6, 'Robbie', 'Wilkins', 'vlpj@----vg.com', '848 South Rocky Cowley Way', '74156', 'Orlando', 1, NULL),
 (7, 'Carla', 'Randall', 'ddth233@-p----.com', '610 North Green Clarendon Freeway', '73193', 'Autumn', 1, NULL),
 (8, 'Heath', 'Dickson', 'rucc@b--c-i.com', '475 North Green Nobel Avenue', '98773', 'Kendall', 0, NULL),
@@ -143,7 +141,8 @@ INSERT INTO `account` (`accountID`, `firstName`, `lastName`, `email`, `address`,
 (97, 'Kurt', 'Huber', 'jwpg.adrp@---f--.net', '74 West Green Hague Road', '46587', 'Josh545', 0, NULL),
 (98, 'Sonya', 'Woodward', 'eefy@-phm--.com', '638 South Rocky Second St.', '23556', 'Jocelyn846', 0, NULL),
 (99, 'Cassandra', 'Charles', 'fprn.uodd@--m-b-.net', '766 South White Second Road', '15554', 'Rolando3', 1, NULL),
-(100, 'Bobbie', 'Ryan', 'trrb@x---db.com', '68 West Green Second Road', '66459', 'Isabel', 1, NULL);
+(100, 'Bobbie', 'Ryan', 'trrb@x---db.com', '68 West Green Second Road', '66459', 'Isabel', 1, NULL),
+(101, 'rwayufwf', 'fasfas', 'fdsafas', 'fadsf', 'asfasd', 'iop', 0, '5975560KNLQSPH5849');
 
 -- --------------------------------------------------------
 
@@ -390,7 +389,23 @@ INSERT INTO `license` (`licenseID`, `softwareID`, `clientOwnerID`, `serialNum`, 
 (222, 80, 12, '32324AWGIWGE448', '2020-10-20', '2021-08-08', 1),
 (223, 86, 27, '32600CUEDGQB179', '2020-07-14', '2021-07-25', 0),
 (224, 17, 16, '81586VEIAUST487', '2020-08-26', '2021-06-06', 1),
-(225, 140, 63, '38874LOLGOPP197', '2020-10-31', '2021-10-03', 1);
+(225, 140, 63, '38874LOLGOPP197', '2020-10-31', '2021-10-03', 1),
+(229, 16, 1, '07574EPULRGW690', '2023-11-30', NULL, 1),
+(230, 16, 1, '42432FFUMTYG678', '2023-11-30', NULL, 1),
+(231, 16, 1, '47593YJDECAJ238', '2023-11-30', NULL, 1),
+(232, 16, 1, '67806MUHGCEY374', '2023-11-30', NULL, 1),
+(233, 16, 1, '62704RCGFHPR346', '2023-11-30', NULL, 1),
+(234, 16, 1, '24470ALBEJKG101', '2023-11-30', NULL, 1),
+(235, 16, 1, '81548YVQKLBU604', '2023-11-30', NULL, 1),
+(236, 16, 1, '45525IFIMRIA071', '2023-11-30', NULL, 1),
+(237, 16, 1, '80286LSJAMUG743', '2023-11-30', NULL, 1),
+(238, 43, 1, '82462BVODWKI064', '2023-11-30', NULL, 1),
+(239, 43, 1, '12134IOJFEBL974', '2023-11-30', NULL, 1),
+(240, 43, 1, '76637XBAPNMU062', '2023-11-30', NULL, 1),
+(241, 16, 1, '76965JGOCBGD456', '2023-12-01', NULL, 1),
+(242, 16, 1, '80337TEGZWXM552', '2023-12-01', NULL, 1),
+(243, 16, 1, '11096XFUTONG937', '2023-12-01', NULL, 1),
+(244, 8, 3, '58317ZMULAGC286', '2023-12-02', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -445,7 +460,6 @@ INSERT INTO `software` (`softwareID`, `ownerID`, `name`, `genre`, `description`,
 (27, 79, 'Winhupicor', 'Graphical', 'Tool used to increase productivity and make your dream design a reality', 6481, 437, 'computer-screen-preview-of-software-650981138.png', 'hqdefault.jpg', 'fwfwfsfs.jpg'),
 (28, 53, 'Grozapupor', 'Lifestyle', 'Utility used to increase productivity and manage your project effectively', 2693, 191, 'software-logo-computer-146902792.png', 'drex_preview_control_screen.png', 'imagest3t.png'),
 (29, 15, 'Upbanonentor', 'Lifestyle', 'Tool used to assist in design and manage your project effectively', 7510, 21, 'software-logo-headphone-443433091.png', 'JgjOHYk-uFCag8kcyosR2KcYD4Q32WOwSQ.png', 'downloaddwd.jpg'),
-(30, 2, 'Endglibupistor', 'Coding', 'Software used to increase productivity and realize your project in an efficient manner', 14866, 327, 'computer-screen-preview-of-software-650981138.png', 'adv1.jpg', 'fwfwfsfs.jpg'),
 (31, 26, 'Klicadackower', 'Lifestyle', 'Utility used to assist in design and realize your project in an efficient manner', 4348, 269, 'software-logo-paint-578339669.png', 'imagest3t.png', 'imagest3t.png'),
 (32, 87, 'Inkilentor', 'Lifestyle', 'Tool used to assist in design and realize your project in an efficient manner', 732, 647, 'computer-screen-preview-of-software-650981138.png', 'imagest3t.png', 'JgjOHYk-uFCag8kcyosR2KcYD4Q32WOwSQ.png'),
 (33, 43, 'Monkilommentor', 'Graphical', 'Tool used to increase productivity and realize your project in an efficient manner', 4150, 307, 'software-logo-apple-916962825.png', 'downloaddwd.jpg', 'imagest3t.png'),
@@ -582,16 +596,14 @@ ALTER TABLE `account`
 -- Indexes for table `license`
 --
 ALTER TABLE `license`
-  ADD PRIMARY KEY (`licenseID`),
-  ADD KEY `fk_clientOwner` (`clientOwnerID`),
-  ADD KEY `fk_software` (`softwareID`);
+  ADD PRIMARY KEY (`licenseID`);
 
 --
 -- Indexes for table `software`
 --
 ALTER TABLE `software`
   ADD PRIMARY KEY (`softwareID`),
-  ADD KEY `fk_owner_provider` (`ownerID`);
+  ADD KEY `fk_child_owner` (`ownerID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -601,13 +613,13 @@ ALTER TABLE `software`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `accountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
 
 --
 -- AUTO_INCREMENT for table `license`
 --
 ALTER TABLE `license`
-  MODIFY `licenseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=226;
+  MODIFY `licenseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=245;
 
 --
 -- AUTO_INCREMENT for table `software`
@@ -620,16 +632,10 @@ ALTER TABLE `software`
 --
 
 --
--- Constraints for table `license`
---
-ALTER TABLE `license`
-  ADD CONSTRAINT `fk_clientOwner` FOREIGN KEY (`clientOwnerID`) REFERENCES `account` (`accountID`),
-  ADD CONSTRAINT `fk_software` FOREIGN KEY (`softwareID`) REFERENCES `software` (`softwareID`);
-
---
 -- Constraints for table `software`
 --
 ALTER TABLE `software`
+  ADD CONSTRAINT `fk_child_owner` FOREIGN KEY (`ownerID`) REFERENCES `account` (`accountID`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_owner` FOREIGN KEY (`ownerID`) REFERENCES `account` (`accountID`),
   ADD CONSTRAINT `fk_owner_provider` FOREIGN KEY (`ownerID`) REFERENCES `account` (`accountID`);
 COMMIT;

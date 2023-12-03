@@ -60,7 +60,7 @@ app.get('/:route', function (req, res) {
 		var autaccountid = account ? account.accountID : null;
 
 		var route = req.params.route;
-		console.log(route);
+		console.log("get" + route);
 		var displayhtml = function(err, data){
 			if (err) {
 				res.writeHead(404, {'Content-Type': 'text/html'});
@@ -71,6 +71,8 @@ app.get('/:route', function (req, res) {
 
 			htmlString = htmlString.replace('<!-- Navbar Placeholder -->', autaccountid ? res.locals.navbarli : res.locals.navbar);
 			htmlString = htmlString.replace('<!-- Account name -->', autaccountid ? account.firstName + " " + account.lastName : "Unknown");
+			if(account && account.provider)
+				htmlString = htmlString.replace('<!-- Provider link -->', `<li class="nav-item"><a class="nav-link" href="provider">Licenses</a></li>`);
 
 			res.writeHead(200, {'Content-Type': 'text/html'});
 			res.write(htmlString);
@@ -82,6 +84,7 @@ app.get('/:route', function (req, res) {
 			if (valid) {
 				res.json(data);
 				console.log(data);
+				console.log("data sent off");
 			} else {
 				console.log("invalid");
 				res.status(500).send('Internal Server Error');
@@ -99,13 +102,18 @@ app.get('/:route', function (req, res) {
 			case "signup": readhtml("signup.html"); break;
 			case "provider": readhtml("Provider.html"); break;
 			case "mainclient": readhtml("MainClient.html"); break;
+			case "licensedb": readhtml("LicenseDatabase.html"); break;
 
+			case "deleteLicense": dbhandler.deleteLicense(req.query.licenseid, function(result, valid){if(valid) {res.redirect("/mainclient");}}); break;
+			case "renewLicense": dbhandler.renewLicense(req.query.licenseid, function(result, valid){if(valid) {res.redirect("/mainclient");}}); break;
 			case "getSoftwareList": dbhandler.getSoftwareList(req.query.page || 1, 10, req.query.genre || null, req.query.search || null, getdata); break;
 			case "getSoftware": if(req.query.id){dbhandler.getSoftwareById(req.query.id, getdata);}; break;
 			case "getTopSoftware": dbhandler.getTopDownloadedSoftware(getdata); break;
-			case "getlicenses": dbhandler.getLicensesFromClientId(autaccountid || req.query.accountID, getdata); break;
-			case "getsoftware": dbhandler.getAllSoftware(getdata); break;
+			case "getlicenses": dbhandler.getLicensesWithSoftwareInfo(autaccountid || req.query.accountID, getdata); break;
+			//case "getsoftware": dbhandler.getAllSoftware(getdata); break;
 			case "getaccountinfo": dbhandler.getAccountById(autaccountid || req.query.accountID, getdata); break;
+			case "logout": generateNewAutKey(autaccountid, function (account, valid) {if (valid && account) {res.redirect("/home");}}); break;
+			case "getSoftwareListOwner": dbhandler.getSoftwaresFromOwnerId(autaccountid, getdata); break;
 		}
 	})
 });
@@ -125,7 +133,7 @@ app.post('/:endpoint', function (req, res) {
 		const postData = req.body;
 
 		console.log(postData);
-		console.log(endpoint);
+		console.log("post: " + endpoint);
 
 		switch (endpoint) {
 			case 'genSerial':
@@ -133,9 +141,9 @@ app.post('/:endpoint', function (req, res) {
 				let accid = autaccountid;
 				let softId = postData.productId;
 				if(accid)
-					generateNewSerialKey(accid, softId, function (response) {res.json(response);});
+					generateNewSerialKey(accid, softId, function (response) {res.json({key: response});});
 				else
-					res.redirect("/login");
+					res.json({msg: "Not logged in"});
 				break;
 
 			case 'logInn':
@@ -210,20 +218,77 @@ app.post('/:endpoint', function (req, res) {
 				}
 			}); break;
 
-			case "update-user-info": dbhandler.updateUserInfo(req.body, (success) => {
+			case "update-user-info": dbhandler.alterAccount(new dbhandler.Account(postData.firstName, postData.lastName, postData.email, postData.address, postData.postalCode, postData.password, postData.provider, autaccountid, account.authenticationCode), (success) => {
 				if (success) {
 					res.json({ success: true });
 				} else {
 					res.status(500).json({ success: false, message: 'Internal Server Error' });
 				}
-			});
+			}); break;
 		
+			case "deleteAccount": dbhandler.deleteAccount(autaccountid, function(account, success){
+				if (success) {
+					res.json({ success: true });
+				} else {
+					res.status(500).json({ success: false, message: 'Internal Server Error' });
+				}
+			}); break;
 
-			// Add more cases as needed
+			case "blockSerial": dbhandler.getLicenseByNum(req.body.serialNumber, function(license, success){
+				if(success && license){
+					dbhandler.disableLicenseByLicenseId(license.licenseID, function(result, success){
+						if (success) {
+							res.json({ success: true });
+						} else {
+							res.status(500).json({ success: false, message: 'Internal Server Error' });
+						}
+					})
+				}
+				else{
+					console.log("No SUCCCC");
+					res.status(500).json({ success: false, message: 'License number doesnt exist' });
+				}
+			}); break;
 
-			default:
-				res.status(404).json({ error: 'Endpoint not found' });
-				break;
+			case "enableSerial": dbhandler.getLicenseByNum(req.body.serialNumber, function(license, success){
+				if(success && license){
+					dbhandler.enableLicenseByLicenseId(license.licenseID, function(result, success){
+						if (success) {
+							res.json({ success: true });
+						} else {
+							res.status(500).json({ success: false, message: 'Internal Server Error' });
+						}
+					})
+				}
+				else{
+					console.log("No SUCCCC");
+					res.status(500).json({ success: false, message: 'License number doesnt exist' });
+				}
+			}); break;
+
+			case "assSerial": console.log(req.body.email); dbhandler.getAccountFromEmail(req.body.email, function(account, success){
+				if(success && account){
+					dbhandler.getLicenseByNum(req.body.serialNumber, function(license, success){
+						if(success && license){
+							license.clientOwnerID = account.accountID;
+							dbhandler.alterLicenseWithoutExpiry(license, function(result, success){
+								if (success) {
+									res.json({ success: true });
+								} else {
+									res.status(500).json({ success: false, message: 'Internal Server Error' });
+								}
+							})
+						}
+
+						else{
+							res.status(500).json({ success: false, message: 'Internal Server Error or license doesnt exist' });
+						}
+					})
+				} else{
+					console.log("Account doesnt exist");
+					res.status(500).json({ success: false, message: 'Internal Server Error or account doesnt exist' });
+				}
+			}); break;
 		}
 	})
 });
@@ -266,7 +331,7 @@ function generateNewSerialKey(accountId, softwareId, callback = function(){}){
 	let currentDate = new Date();
 	const dateAfter30Days = new Date(currentDate);
 	dateAfter30Days.setDate(currentDate.getDate() + 30);
-	dbhandler.insertLicense(new dbhandler.License(softwareId, /*Change this after aut*/accountId, serialNumber, true, `${currentDate.getFullYear}-${currentDate.getMonth + 1}-${currentDate.getDay}`, `${dateAfter30Days.getFullYear}-${dateAfter30Days.getMonth + 1}-${dateAfter30Days.getDay}`), callback);
+	dbhandler.insertLicense(new dbhandler.License(softwareId, accountId, serialNumber, true), callback);
 
 }
 
